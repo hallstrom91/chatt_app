@@ -1,0 +1,23 @@
+:root {
+  --color-bg-light: #dddddd;
+  --color-bg-dark: #222222;
+  --color-icon-dark: #000000;
+  --color-icon-light: #ffffff;
+}
+
+body.bg-light {
+  background-color: var(--color-bg-light);
+}
+body.bg-dark {
+  background-color: var(--color-bg-dark);
+}
+
+.icon {
+  fill: var(--color-icon-dark);
+  stroke: var(--color-icon-dark);
+}
+
+body.bg-dark .icon {
+  fill: var(--color-icon-light);
+  stroke: var(--color-icon-light);
+}
