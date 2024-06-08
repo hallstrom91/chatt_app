@@ -1,12 +1,11 @@
-import SignIn from "@login/SignIn";
-import Register from "@login/Register";
+import SignUp from "@users/SignUp";
 
-export default function Home() {
+export default function Register() {
   return (
     <>
       <main className="w-full h-screen flex flex-col justify-center items-center">
         <div className="m-16 min-w-xl">
-          <SignIn />
+          <SignUp />
         </div>
       </main>
     </>

@@ -1,13 +1,11 @@
 import React, { useState } from "react";
-import { useTheme } from "@contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import Open from "@assets/svg/Open.svg?react";
-import Cross from "@assets/svg/Cross.svg?react";
+import Open from "@svg/Open.svg?react";
+import Cross from "@svg/Cross.svg?react";
 
 export default function Navigation() {
   const navigate = useNavigate();
-  const { toggleTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleToggle = () => {
@@ -34,18 +32,14 @@ export default function Navigation() {
           </h1>
         </div>
         <nav className="p-4 h-full">
-          <ul className="mb-4 text-lg">
-            <li>Login</li>
-            <li>Register</li>
+          <ul className="mb-4 text-xl font-semibold">
+            <li className="my-2">
+              <Link to="/">Login</Link>
+            </li>
+            <li className="my-2">
+              <Link to="/register">Register</Link>
+            </li>
           </ul>
-          <div>
-            <button
-              onClick={toggleTheme}
-              className="p-2 border-2 rounded bg-button-light border-lines-light dark:bg-button-dark dark:border-lines-dark"
-            >
-              Tema
-            </button>
-          </div>
         </nav>
       </div>
     </>

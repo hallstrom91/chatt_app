@@ -18,11 +18,11 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@assets": "/src/assets",
-      "@chat": "/src/components/chat",
-      "@login": "/src/components/login",
+      "@images": "/src/assets/images",
+      "@svg": "/src/assets/svg",
+      "@interface": "/src/components/interface",
       "@shared": "/src/components/shared",
-      "@user": "/src/components/user",
+      "@users": "/src/components/users",
       "@contexts": "/src/contexts",
       "@helpers": "/src/helpers",
       "@hooks": "/src/hooks",

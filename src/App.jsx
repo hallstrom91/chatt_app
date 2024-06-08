@@ -14,7 +14,7 @@ export default function App() {
       <Navigation />
       <Routes>
         <Route path="/*" element={<PublicRoute />} />
-        <Route path="/user" element={<ProtectedRoute />} />
+        <Route path="/protected" element={<ProtectedRoute />} />
       </Routes>
       <Footer />
     </>
