@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@hooks/useAuth";
 import Locked from "@svg/Locked.svg?react";
 
 export default function SignIn() {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [error, setError] = useState("");
   const [userData, setUserData] = useState({
     username: "",
@@ -20,7 +22,7 @@ export default function SignIn() {
     try {
       await login(userData.username, userData.password);
       console.info("login success");
-      // redirect if success
+      navigate("/profile");
     } catch (error) {
       setError("Inloggning misslyckad.");
       setTimeout(() => {
@@ -78,16 +80,19 @@ export default function SignIn() {
                 className="rounded block px-2 py-1 tracking-tight text-black"
               />
             </div>
+            <div className="flex justify-end mr-10 mt-4">
+              <button
+                type="submit"
+                className="px-2 py-1 border-2  rounded tracking-tight font-semibold bg-button-light border-lines-light dark:bg-button-dark dark:border-lines-dark"
+              >
+                Skicka
+              </button>
+            </div>
           </form>
-          <div className="flex justify-end mr-10 mt-4">
-            <button
-              type="submit"
-              className="px-2 py-1 border-2  rounded tracking-tight font-semibold bg-button-light border-lines-light dark:bg-button-dark dark:border-lines-dark"
-            >
-              Skicka
-            </button>
-          </div>
         </div>
+        {error && (
+          <p className="text-font-light dark:text-font-dark">{error}</p>
+        )}
       </section>
     </>
   );

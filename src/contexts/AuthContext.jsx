@@ -28,6 +28,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // simontheking, hejsan123, simon@simon.se , avatar.se
   const register = async (username, password, email, avatar) => {
     try {
       const response = await fetch(

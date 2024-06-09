@@ -1,13 +1,12 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
-import UserInterface from "@pages/UserInterface";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "@hooks/useAuth";
 
-export default function ProtectedRoute() {
-  return (
-    <>
-      <Routes>
-        <Route path="/ui" element={<UserInterface />} />
-      </Routes>
-    </>
-  );
+export default function ProtectedRoute({ children }) {
+  const { user } = useAuth();
+
+  if (!user) {
+    <Navigate to="/" />;
+  }
+  return children;
 }

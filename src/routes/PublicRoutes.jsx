@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Login from "@pages/Login";
 import Register from "@pages/Register";
 
-export default function PublicRoute() {
+export default function PublicRoutes() {
   return (
     <>
       <Routes>

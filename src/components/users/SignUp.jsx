@@ -21,8 +21,6 @@ export default function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setError("");
-      setSuccess("");
       const data = await register(
         userData.username,
         userData.password,
@@ -30,6 +28,8 @@ export default function SignUp() {
         userData.avatar
       );
       setSuccess("Registrering lyckad.");
+      console.log("API Response - Register:", data);
+      setUserData({ username: "", password: "", email: "", avatar: "" });
       setTimeout(() => {
         setSuccess("");
       }, 3000);
@@ -127,16 +127,22 @@ export default function SignUp() {
                 className="rounded block px-2 py-1 tracking-tight text-black"
               />
             </div>
+            <div className="flex justify-end mr-10 mt-4">
+              <button
+                type="submit"
+                className="px-2 py-1 border-2 rounded tracking-tight font-semibold bg-button-light border-lines-light dark:bg-button-dark dark:border-lines-dark"
+              >
+                Skicka
+              </button>
+            </div>
           </form>
-          <div className="flex justify-end mr-10 mt-4">
-            <button
-              type="submit"
-              className="px-2 py-1 border-2 rounded tracking-tight font-semibold bg-button-light border-lines-light dark:bg-button-dark dark:border-lines-dark"
-            >
-              Skicka
-            </button>
-          </div>
         </div>
+        {error && (
+          <p className="text-font-light dark:text-font-dark">{error}</p>
+        )}
+        {success && (
+          <p className="text-font-light dark:text-font-dark">{success}</p>
+        )}
       </section>
     </>
   );

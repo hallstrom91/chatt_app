@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Open from "@svg/Open.svg?react";
 import Cross from "@svg/Cross.svg?react";
+import { useAuth } from "@hooks/useAuth";
 
 export default function Navigation() {
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -33,12 +35,41 @@ export default function Navigation() {
         </div>
         <nav className="p-4 h-full">
           <ul className="mb-4 text-xl font-semibold">
-            <li className="my-2">
-              <Link to="/">Login</Link>
-            </li>
-            <li className="my-2">
-              <Link to="/register">Register</Link>
-            </li>
+            {user ? (
+              <>
+                <li className="my-2">
+                  <Link to onClick={handleToggle}>
+                    {user.username}
+                  </Link>
+                </li>
+                <li className="my-2">
+                  <Link to onClick={handleToggle}>
+                    Chatt
+                  </Link>
+                </li>
+                <li className="my-2">
+                  <button
+                    onClick={logout}
+                    className="px-2 py-1 border-2 rounded tracking-tight font-semibold bg-button-light border-lines-light dark:bg-button-dark dark:border-lines-dark"
+                  >
+                    Logga ut
+                  </button>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="my-2">
+                  <Link to="/" onClick={handleToggle}>
+                    Login
+                  </Link>
+                </li>
+                <li className="my-2">
+                  <Link to="/register" onClick={handleToggle}>
+                    Register
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>
         </nav>
       </div>

@@ -5,16 +5,16 @@ import "./App.css";
 import Navigation from "@shared/Navigation";
 import Footer from "@shared/Footer";
 // routes
-import PublicRoute from "@routes/PublicRoute";
-import ProtectedRoute from "./routes/ProtectedRoute";
+import PublicRoutes from "@routes/PublicRoutes";
+import PrivateRoutes from "@routes/PrivateRoutes";
 
 export default function App() {
   return (
     <>
       <Navigation />
       <Routes>
-        <Route path="/*" element={<PublicRoute />} />
-        <Route path="/protected" element={<ProtectedRoute />} />
+        <Route path="/*" element={<PublicRoutes />} />
+        <Route path="/*" element={<PrivateRoutes />} />
       </Routes>
       <Footer />
     </>
