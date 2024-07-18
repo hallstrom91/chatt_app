@@ -6,28 +6,32 @@ export default {
     extend: {
       colors: {
         primary: {
-          light: "#007BFF", // almost white
-          dark: "#444444", // almost black
+          light: "#ffffff", // white
+          dark: "#000000", // black or #071011
         },
         secondary: {
-          light: "#6C757D", // grey-white
-          dark: "#666666", // grey-black
-        },
-        font: {
-          light: "#000000", // black
-          dark: "#ffffff", // white
+          light: "#8592a2", //
+          dark: "#495059", //
         },
         navbar: {
           light: "#c6c6c6", // almost white
-          dark: "#202020", // dark grey
+          dark: "#071011", // dark blue
         },
-        button: {
-          light: "#3880b6", // light blue
-          dark: "#65358b", // purple
+        chatLayout: {
+          light: "#b3b3b3",
+          dark: "#535353",
         },
-        lines: {
-          light: "#2d5471", // shiny blue
-          dark: "#a587bc", // light purple
+        chatHeader: {
+          light: "#707070",
+          dark: "#1a3e46",
+        },
+        chatUser: {
+          light: "#405588",
+          dark: "#405588",
+        },
+        chatGuest: {
+          light: "#b1b7c2",
+          dark: "#b1b7c2",
         },
       },
     },

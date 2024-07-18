@@ -18,6 +18,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
+      "@api": "/src/api",
       "@images": "/src/assets/images",
       "@svg": "/src/assets/svg",
       "@interface": "/src/components/interface",

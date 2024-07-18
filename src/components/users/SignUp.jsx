@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import Clipboard from "@svg/Clipboard.svg?react";
+import RegisterClipboard from "@svg/RegisterClipboard.svg?react";
 import { useAuth } from "@hooks/useAuth";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function SignUp() {
   const { register } = useAuth();
+  const navigate = useNavigate();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [userData, setUserData] = useState({
@@ -28,11 +31,12 @@ export default function SignUp() {
         userData.avatar
       );
       setSuccess("Registrering lyckad.");
-      console.log("API Response - Register:", data);
+      console.info("API Response - Register:", data);
       setUserData({ username: "", password: "", email: "", avatar: "" });
       setTimeout(() => {
         setSuccess("");
       }, 3000);
+      navigate("/");
     } catch (error) {
       console.error("register failed", error.message);
       setError("Registrering misslyckad");
@@ -50,16 +54,13 @@ export default function SignUp() {
             <h1 className="text-3xl text-center tracking-tight font-bold">
               Registrera
             </h1>
-            <Clipboard className="icon ml-2" height={35} />
+            <RegisterClipboard className="icon ml-2" height={35} />
           </div>
-          <form
-            onSubmit={handleSubmit}
-            className="grid justify-items-center px-5"
-          >
-            <div className="px-4 mb-2">
+          <div className="grid justify-items-center px-5">
+            <div className="px-4 mb-3">
               <label
                 htmlFor="register-username"
-                className="tracking-tighter font-semibold"
+                className="tracking-tighter font-semibold hidden"
               >
                 Användarnamn:
               </label>
@@ -68,16 +69,16 @@ export default function SignUp() {
                 name="username"
                 id="register-username"
                 autoComplete="username"
-                placeholder="Username"
+                placeholder="Användarnamn"
                 value={userData.username}
                 onChange={handleChange}
-                className="rounded block px-2 py-1 tracking-tight text-black"
+                className="rounded block px-2 py-1 tracking-tight text-black placeholder-neutral-500"
               />
             </div>
-            <div className="px-4 mb-2 justify-center">
+            <div className="px-4 mb-3 justify-center">
               <label
                 htmlFor="register-password"
-                className="tracking-tighter font-semibold"
+                className="tracking-tighter font-semibold hidden"
               >
                 Lösenord:
               </label>
@@ -89,13 +90,13 @@ export default function SignUp() {
                 placeholder="Lösenord"
                 value={userData.password}
                 onChange={handleChange}
-                className="rounded block px-2 py-1 tracking-tight text-black"
+                className="rounded block px-2 py-1 tracking-tight text-black placeholder-neutral-500"
               />
             </div>
-            <div className="px-4 mb-2 justify-center">
+            <div className="px-4 mb-3 justify-center">
               <label
                 htmlFor="register-email"
-                className="tracking-tighter font-semibold"
+                className="tracking-tighter font-semibold hidden"
               >
                 Epost:
               </label>
@@ -107,13 +108,13 @@ export default function SignUp() {
                 placeholder="Epost"
                 value={userData.email}
                 onChange={handleChange}
-                className="rounded block px-2 py-1 tracking-tight text-black"
+                className="rounded block px-2 py-1 tracking-tight text-black placeholder-neutral-500"
               />
             </div>
-            <div className="px-4 mb-2 justify-center">
+            <div className="px-4 mb-3 justify-center">
               <label
                 htmlFor="register-avatar"
-                className="tracking-tighter font-semibold"
+                className="tracking-tighter font-semibold hidden"
               >
                 Avatar
               </label>
@@ -124,24 +125,33 @@ export default function SignUp() {
                 placeholder="Avatar"
                 value={userData.avatar}
                 onChange={handleChange}
-                className="rounded block px-2 py-1 tracking-tight text-black"
+                className="rounded block px-2 py-1 tracking-tight text-black placeholder-neutral-500"
               />
             </div>
-            <div className="flex justify-end mr-10 mt-4">
-              <button
-                type="submit"
-                className="px-2 py-1 border-2 rounded tracking-tight font-semibold bg-button-light border-lines-light dark:bg-button-dark dark:border-lines-dark"
-              >
-                Skicka
-              </button>
-            </div>
-          </form>
+          </div>
+          <div className="grid justify-end mr-10">
+            <Link to={"/"} className="text-xs">
+              Redan medlem?
+            </Link>
+          </div>
+          <div className="flex justify-end mr-10 mt-4">
+            <button
+              onClick={handleSubmit}
+              className="px-2 py-1 border-2 rounded tracking-tight font-semibold bg-button-light border-lines-light dark:bg-button-dark dark:border-lines-dark"
+            >
+              Skicka
+            </button>
+          </div>
         </div>
         {error && (
-          <p className="text-font-light dark:text-font-dark">{error}</p>
+          <p className="text-font-light dark:text-font-dark text-center">
+            {error}
+          </p>
         )}
         {success && (
-          <p className="text-font-light dark:text-font-dark">{success}</p>
+          <p className="text-font-light dark:text-font-dark text-center">
+            {success}
+          </p>
         )}
       </section>
     </>

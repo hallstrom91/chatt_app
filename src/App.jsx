@@ -4,19 +4,31 @@ import "./App.css";
 // components
 import Navigation from "@shared/Navigation";
 import Footer from "@shared/Footer";
-// routes
-import PublicRoutes from "@routes/PublicRoutes";
-import PrivateRoutes from "@routes/PrivateRoutes";
+import MainRoutes from "@routes/MainRoutes";
+//context
+import { ThemeProvider } from "@contexts/ThemeContext";
+import { AuthProvider } from "@contexts/AuthContext";
+import { UserProvider } from "@contexts/UserContext";
+import { MessageProvider } from "@contexts/MessageContext";
+//error handler
+import ErrroBoundary from "@utils/ErrorBoundary";
 
 export default function App() {
   return (
     <>
-      <Navigation />
-      <Routes>
-        <Route path="/*" element={<PublicRoutes />} />
-        <Route path="/*" element={<PrivateRoutes />} />
-      </Routes>
-      <Footer />
+      <AuthProvider>
+        <UserProvider>
+          <MessageProvider>
+            <ThemeProvider>
+              <ErrroBoundary>
+                <Navigation />
+                <MainRoutes />
+                <Footer />
+              </ErrroBoundary>
+            </ThemeProvider>
+          </MessageProvider>
+        </UserProvider>
+      </AuthProvider>
     </>
   );
 }
