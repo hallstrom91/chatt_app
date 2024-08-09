@@ -1,4 +1,4 @@
-import SignIn from "@users/SignIn";
+import SignIn from "@authentication/SignIn";
 
 export default function Login() {
   return (

@@ -1,9 +1,7 @@
-import React, { useState } from "react";
-import UserProfile from "@users/UserProfile";
-import UserNavigation from "@interface/UserNavigation";
-import UpdateUser from "@users/edit/UpdateUser";
-import RemoveUser from "@users/edit/RemoveUser";
-import UserSecurity from "@users/edit/UserSecurity";
+import { useState } from "react";
+import UserNavigation from "@navigation/UserNavigation";
+import ProfileDisplay from "@profile/ProfileDisplay";
+import ProfileUpdate from "@profile/ProfileUpdate";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("profile");
@@ -11,24 +9,25 @@ export default function Dashboard() {
   const renderContent = () => {
     switch (activeTab) {
       case "profile":
-        return <UpdateUser />;
+        return <ProfileDisplay />;
       case "security":
-        return <UserSecurity />;
+        return <ProfileUpdate />;
       default:
-        return <UpdateUser />;
+        return <ProfileDisplay />;
     }
   };
+
   return (
     <>
-      <main className="pt-16 w-full bg-secondary-light dark:bg-secondary-dark shadow-xl shadow-black/20 dark:shadow-white/20">
+      <main className="pt-16 px-2 w-full">
         <div className="flex w-full">
           <div className="w-1/4 lg:w-1/6 flex flex-col pb-10">
-            <div className="w-full h-full rounded-tl-lg rounded-bl-lg mx-2 bg-navbar-light dark:bg-navbar-dark">
+            <div className="w-full h-full rounded-tl-lg rounded-bl-lg mx-2 bg-navbar-light dark:bg-navbar-dark border-l border-b border-t border-black/20 dark:border-white/20">
               <UserNavigation setActiveTab={setActiveTab} />
             </div>
           </div>
           <div className="w-3/4 lg:w-5/6 flex flex-row pb-10">
-            <div className="w-full h-full rounded-br-lg rounded-tr-xl mx-2 bg-primary-light dark:bg-primary-dark">
+            <div className="w-full h-full rounded-br-lg rounded-tr-xl mx-2 bg-container-light dark:bg-container-dark border-r border-b border-t border-black/20 dark:border-white/20">
               {renderContent()}
             </div>
           </div>

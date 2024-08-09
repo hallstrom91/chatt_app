@@ -1,27 +1,30 @@
-import React from "react";
 import { Routes, Route } from "react-router-dom";
-import ProtectedRoute from "@helpers/ProtectedRoute";
+import AuthProtection from "@routes/AuthProtection";
 import Dashboard from "@pages/Dashboard";
 import ChatInterface from "@pages/ChatInterface";
+import SideNavigation from "@navigation/SideNavigation";
 
 export default function PrivateRoutes() {
   return (
     <>
+      <AuthProtection>
+        <SideNavigation />
+      </AuthProtection>
       <Routes>
         <Route
           path="/profile"
           element={
-            <ProtectedRoute>
+            <AuthProtection>
               <Dashboard />
-            </ProtectedRoute>
+            </AuthProtection>
           }
         />
         <Route
           path="/chat"
           element={
-            <ProtectedRoute>
+            <AuthProtection>
               <ChatInterface />
-            </ProtectedRoute>
+            </AuthProtection>
           }
         />
       </Routes>

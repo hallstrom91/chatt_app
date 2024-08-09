@@ -1,5 +1,6 @@
-import React, { createContext, useState, useEffect } from "react";
-import { useAuth } from "@hooks/useAuth";
+import { createContext, useState, useEffect } from "react";
+import { useAuth } from "@hooks/useContextHooks";
+import { v4 as uuidv4 } from "uuid";
 
 const MessageContext = createContext();
 
@@ -8,12 +9,6 @@ export const MessageProvider = ({ children }) => {
   const { user, jwtToken } = useAuth();
   const [messages, setMessages] = useState([]);
   const [currentConversation, setCurrentConversation] = useState(null);
-
-  /*   useEffect(() => {
-    if (user && jwtToken) {
-      fetchMessages();
-    }
-  }, [user, jwtToken]); */
 
   // fetch messages connected to conversation id
   const fetchConversation = async (conversationId) => {
@@ -29,7 +24,6 @@ export const MessageProvider = ({ children }) => {
         }
       );
       const data = await response.json();
-      console.log("return data - Fetch Conversations:", data);
       return data;
     } catch (error) {
       console.error("Failed to fetch messages:", error);
@@ -49,15 +43,15 @@ export const MessageProvider = ({ children }) => {
         },
       });
       const data = await response.json();
-      console.log("messages state - Fetch Messages function:", data);
       setMessages(data);
+      return data;
     } catch (error) {
       console.error("Failed to fetch messages", error);
       throw error;
     }
   };
 
-  // create message - *** ADD UUID ***
+  // create message
   const createMessage = async (message) => {
     try {
       const response = await fetch(`${API_URL}/messages`, {
@@ -68,11 +62,10 @@ export const MessageProvider = ({ children }) => {
         },
         body: JSON.stringify(message),
       });
-      const newMessage = await response.json();
-      if (newMessage.conversationId === currentConversation) {
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-      }
-      fetchMessages(currentConversation);
+      const data = await response.json();
+      const newMessage = data.latestMessage;
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      return newMessage;
     } catch (error) {
       console.error("Failed to create and send message:", error);
       throw error;
@@ -89,45 +82,60 @@ export const MessageProvider = ({ children }) => {
           "Content-Type": "application/json",
         },
       });
-      setMessages((prevMessages) =>
-        prevMessages.filter((message) => message.id !== msgId)
-      );
-      fetchMessages(currentConversation);
     } catch (error) {
       console.error("Failed to delete message:");
       throw error;
     }
   };
 
-  // add msg together to conversation/chat
-  const groupMessagesByConversation = (messages) => {
-    const grouped = messages.reduce((acc, message) => {
-      const { conversationId } = message;
-      if (!acc[conversationId]) {
-        acc[conversationId] = [];
-      }
-      acc[conversationId].push(message);
-      return acc;
-    }, {});
+  // delete ALL messages related to user
+  const deleteAllMessages = async () => {
+    try {
+      const response = await fetchMessages();
+      await Promise.all(response.map((msg) => deleteMessage(msg.id)));
+    } catch (error) {
+      console.error(
+        `Failed to delete all messages for userId ${user.id}:`,
+        error
+      );
+      throw error;
+    }
+  };
 
-    return Object.keys(grouped).map((conversationId) => ({
-      conversationId,
-      messages: grouped[conversationId],
-      friendId: grouped[conversationId][0].userId,
-      friendUsername: grouped[conversationId][0].username,
-      friendAvatar: grouped[conversationId][0].avatar,
-    }));
+  // Invite user to new chat -- RENMAE?? createInvite??
+  const handleInvite = async (userId) => {
+    const createInviteUUID = uuidv4();
+    try {
+      const response = await fetch(`${API_URL}/invite/${userId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ conversationId: createInviteUUID }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return createInviteUUID;
+      }
+      throw new Error("Invitation Failed");
+    } catch (error) {
+      console.error("Error with invite", error);
+      throw error;
+    }
   };
 
   // export value
   const value = {
     messages,
     currentConversation,
+    handleInvite,
     fetchConversation,
     setCurrentConversation,
     fetchMessages,
     createMessage,
     deleteMessage,
+    deleteAllMessages,
   };
 
   return (

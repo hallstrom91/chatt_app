@@ -1,4 +1,4 @@
-import SignUp from "@users/SignUp";
+import SignUp from "@authentication/SignUp";
 
 export default function Register() {
   return (

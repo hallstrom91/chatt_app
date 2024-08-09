@@ -18,12 +18,15 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@api": "/src/api",
       "@images": "/src/assets/images",
       "@svg": "/src/assets/svg",
-      "@interface": "/src/components/interface",
+      "@authentication": "/src/components/authentication",
+      "@chat": "/src/components/chat",
+      "@invites": "/src/components/invites",
+      "@layout": "/src/components/layout",
+      "@navigation": "/src/components/navigation",
+      "@profile": "/src/components/profile",
       "@shared": "/src/components/shared",
-      "@users": "/src/components/users",
       "@contexts": "/src/contexts",
       "@helpers": "/src/helpers",
       "@hooks": "/src/hooks",

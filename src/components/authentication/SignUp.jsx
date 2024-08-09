@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useAuth } from "@hooks/useContextHooks";
+import { Link, useNavigate } from "react-router-dom";
 import RegisterClipboard from "@svg/RegisterClipboard.svg?react";
-import { useAuth } from "@hooks/useAuth";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 
 export default function SignUp() {
   const { register } = useAuth();
@@ -36,6 +35,7 @@ export default function SignUp() {
       setTimeout(() => {
         setSuccess("");
       }, 3000);
+      // add fetchCSrfToken() here or context?
       navigate("/");
     } catch (error) {
       console.error("register failed", error.message);
@@ -48,7 +48,7 @@ export default function SignUp() {
 
   return (
     <>
-      <section className="border rounded-lg bg-secondary-light border-lines-light text-font-light dark:bg-secondary-dark dark:border-lines-dark dark:text-font-dark">
+      <section className="border rounded-lg bg-container-light dark:bg-container-dark  text-black dark:text-white border-black/20 dark:border-white/20">
         <div className="mb-10 flex-row justify-center items-center align-middle">
           <div className="py-8 flex justify-center items-center align-middle">
             <h1 className="text-3xl text-center tracking-tight font-bold">
@@ -137,7 +137,7 @@ export default function SignUp() {
           <div className="flex justify-end mr-10 mt-4">
             <button
               onClick={handleSubmit}
-              className="px-2 py-1 border-2 rounded tracking-tight font-semibold bg-button-light border-lines-light dark:bg-button-dark dark:border-lines-dark"
+              className="px-2 py-1 mt-2 text-sm border border-black rounded text-white bg-btnLogin-light dark:bg-btnLogin-dark tracking-tight"
             >
               Skicka
             </button>
