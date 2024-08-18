@@ -2,6 +2,9 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -20,9 +23,9 @@ export default defineConfig({
       },
     }),
     sentryVitePlugin({
-      org: "student-qhn",
-      project: "chattapp",
-      authToken: import.meta.env.VITE_APP_SENTRY_TOKEN,
+      org: process.env.VITE_SENTRY_ORG,
+      project: process.env.VITE_SENTRY_PROJECT,
+      authToken: process.env.VITE_SENTRY_AUTH_TOKEN,
     }),
   ],
   resolve: {

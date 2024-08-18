@@ -4,7 +4,7 @@ import useLocalStorage from "@hooks/useLocalStorage";
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const API_URL = import.meta.env.VITE_APP_API_URL;
+  const API_URL = import.meta.env.VITE_API_URL;
   const { user, jwtToken, logout } = useAuth();
   const [userList, setUserList] = useState([]);
   const [invites, setInvites] = useState([]);

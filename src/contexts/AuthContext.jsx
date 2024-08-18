@@ -7,7 +7,7 @@ import useLocalStorage from "@hooks/useLocalStorage";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const API_URL = import.meta.env.VITE_APP_API_URL;
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const [csrfToken, setCsrfToken] = useState(null);
   const [user, setUser] = useLocalStorage("user", null);
