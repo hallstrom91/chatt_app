@@ -15,7 +15,7 @@ export default function ErrorFallback({ onReset }) {
   const handleClick = () => {
     onReset();
     if (isTokenValid()) {
-      navigate("/app/profile");
+      navigate("/profile");
     } else {
       logout();
       navigate("/");

@@ -4,7 +4,8 @@ import { useAuth } from "@hooks/useContextHooks";
 import SignInLock from "@svg/SignInLock.svg?react";
 
 export default function SignIn() {
-  const { login, fetchCrsfToken } = useAuth();
+  const { login, logout, fetchCrsfToken, isAuthenticated, jwtToken } =
+    useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [userData, setUserData] = useState({
@@ -22,7 +23,7 @@ export default function SignIn() {
     try {
       await login(userData.username, userData.password);
       console.info("login success");
-      navigate("/app/profile");
+      navigate("/profile", { replace: true });
     } catch (error) {
       setError("Inloggning misslyckad.");
       setTimeout(() => {

@@ -6,6 +6,7 @@ const ThemeContext = createContext();
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(Cookies.get("theme") || "light");
 
+  // move & fix
   useEffect(() => {
     Cookies.set("theme", theme, { expires: 365 });
     document.documentElement.classList.remove("light", "dark");

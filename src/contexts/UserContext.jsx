@@ -1,44 +1,22 @@
 import React, { createContext, useState, useEffect } from "react";
 import { useAuth } from "@hooks/useContextHooks";
-
+import useLocalStorage from "@hooks/useLocalStorage";
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const API_URL = "https://chatify-api.up.railway.app";
+  const API_URL = import.meta.env.VITE_APP_API_URL;
   const { user, jwtToken, logout } = useAuth();
   const [userList, setUserList] = useState([]);
   const [invites, setInvites] = useState([]);
-  const [ignoredInvites, setIgnoredInvites] = useState([]);
-  const [acceptedInvites, setAcceptedInvites] = useState([]);
 
-  useEffect(() => {
-    // collect at mount if user/jwtToken
-    if (user && jwtToken) {
-      console.log("useEffect in usercontext");
-      fetchAllUsers();
-      // get declined invites for signed in user
-      const storedIgnoredInvites =
-        JSON.parse(localStorage.getItem(`${user.id}_ignoredInvites`)) || [];
-      setIgnoredInvites(storedIgnoredInvites);
-
-      // get accepted invites for signed in user
-      const storedAcceptedInvites =
-        JSON.parse(localStorage.getItem(`${user.id}_acceptedInvites`)) || [];
-      setAcceptedInvites(storedAcceptedInvites);
-      // fetch invites
-      fetchUserInvites(user.id);
-    }
-
-    // check for new invites with interval
-    const interval = setInterval(() => {
-      if (user & jwtToken) {
-        console.log("Check for new invites inteval = 3min.");
-        fetchUserInvites(user.id);
-      }
-    }, 180000); // 180s - 3min
-
-    return () => clearInterval(interval);
-  }, [user, jwtToken]);
+  const [ignoredInvites, setIgnoredInvites] = useLocalStorage(
+    user ? `${user.id}_ignoredInvites` : null,
+    []
+  );
+  const [acceptedInvites, setAcceptedInvites] = useLocalStorage(
+    user ? `${user.id}_acceptedInvites` : null,
+    []
+  );
 
   // fetch all users in app - for friend req etc..
   const fetchAllUsers = async () => {
@@ -130,24 +108,16 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  // accept invite function
+  // accept invite functions
+
   const handleAcceptInvite = (conversationId) => {
     const updatedAcceptedInvites = [...acceptedInvites, conversationId];
     setAcceptedInvites(updatedAcceptedInvites);
-    localStorage.setItem(
-      `${user.id}_acceptedInvites`,
-      JSON.stringify(updatedAcceptedInvites)
-    );
   };
 
-  // decline invite function
   const handleIgnoreInvite = (conversationId) => {
-    const updateIgnoredInvites = [...ignoredInvites, conversationId];
-    setIgnoredInvites(updateIgnoredInvites);
-    localStorage.setItem(
-      `${user.id}_ignoredInvites`,
-      JSON.stringify(updateIgnoredInvites)
-    );
+    const updatedIgnoredInvites = [...ignoredInvites, conversationId];
+    setIgnoredInvites(updatedIgnoredInvites);
   };
 
   // export values
@@ -155,7 +125,9 @@ export const UserProvider = ({ children }) => {
     userList,
     invites,
     ignoredInvites,
+    setIgnoredInvites,
     acceptedInvites,
+    setAcceptedInvites,
     handleAcceptInvite,
     handleIgnoreInvite,
     fetchUserInvites,

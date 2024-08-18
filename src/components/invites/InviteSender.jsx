@@ -1,6 +1,6 @@
 import { useState } from "react";
-
-export default function ChatInvite({
+import { useAuth } from "@hooks/useContextHooks";
+export default function InviteSender({
   userList,
   onClose,
   onInvite,
@@ -11,13 +11,17 @@ export default function ChatInvite({
   const [isStepTwo, setIsStepTwo] = useState(false);
   const [newConversationId, setNewConversationId] = useState(null);
   const [firstMessage, setFirstMessage] = useState("");
+  const { user } = useAuth();
 
-  // filter users by searchinput
-  const filteredUsers = userList.filter((user) =>
-    user.username?.toLowerCase().includes(userSearch.toLowerCase())
-  );
+  // filter users and find by searchinput
+  const filteredUsers = userList
+    .filter((u) => u.userId !== user.id)
+    .filter((u) =>
+      u.username?.toLowerCase().includes(userSearch.toLowerCase())
+    );
 
   // handle invite submit and go to next step -> first message
+
   const handleInviteSubmit = async () => {
     if (selectedUser) {
       try {
@@ -52,40 +56,46 @@ export default function ChatInvite({
   return (
     <>
       <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center">
-        <div className="bg-white p-4 rounded-lg shadow-lg w-80 text-black">
+        <div className="w-80 bg-container-light dark:bg-container-dark p-4 rounded border text-black dark:text-white border-black/20 dark:border-white/20">
           {!isStepTwo ? (
             <>
-              <h2 className="text-xl font-bold mb-4">Skapa en ny chatt</h2>
+              <h1 className="text-xl font-bold mb-4">Skapa en ny chatt</h1>
               <input
                 type="text"
                 placeholder="Hitta Användare"
                 value={userSearch}
                 onChange={(e) => setUserSearch(e.target.value)}
-                className="w-full p-2 border rounded mb-4"
+                className="w-full p-2 border rounded mb-4 text-black"
               />
-              <ul className="max-h-40 overflow-y-auto">
+              <p className="text-sm font-semibold">Hitta en vän</p>
+              <span className="flex w-full border border-white my-2"></span>
+              <ul className="max-h-72 overflow-y-auto">
                 {filteredUsers.map((user) => (
                   <li
                     key={user.userId}
-                    className={`p-2 cursor-pointer text-xs ${
-                      selectedUser === user ? "bg-gray-400 rounded" : ""
+                    className={`px-2 rounded py-2 ${
+                      selectedUser === user
+                        ? "bg-container-dark dark:bg-container-light text-white dark:text-black"
+                        : ""
                     }`}
                     onClick={() => setSelectedUser(user)}
                   >
-                    {user.username}
+                    <p className="font-semibold text-xs cursor-pointer">
+                      {user.username}
+                    </p>
                   </li>
                 ))}
               </ul>
               <div className="flex justify-end mt-4">
                 <button
                   onClick={onClose}
-                  className="mr-2 px-4 py-2 bg-btnNeutral-light dark:bg-btnNeutral-dark text-white dark:text-black rounded"
+                  className="mr-2 px-2 py-1 bg-btnNeutral-light dark:bg-btnNeutral-dark text-white dark:text-black rounded"
                 >
                   Avbryt
                 </button>
                 <button
                   onClick={handleInviteSubmit}
-                  className="px-4 py-2 bg-btnPrimary-light dark:bg-btnPrimary-dark text-white rounded"
+                  className="px-2 py-1 bg-btnPrimary-light dark:bg-btnPrimary-dark text-white rounded"
                 >
                   Skicka
                 </button>
@@ -98,17 +108,17 @@ export default function ChatInvite({
                 placeholder="Meddelande..."
                 value={firstMessage}
                 onChange={(e) => setFirstMessage(e.target.value)}
-                className="w-full p-2 border rounded mb-4"
+                className="w-full p-2 border rounded mb-4 text-black"
               />
               <button
                 onClick={onClose}
-                className="mr-2 px-4 py-2 bg-btnNeutral-light dark:bg-btnNeutral-dark text-white dark:text-black rounded"
+                className="mr-2 px-2 py-1 bg-btnNeutral-light dark:bg-btnNeutral-dark text-white dark:text-black rounded"
               >
                 Avbryt
               </button>
               <button
                 onClick={createFirstMessage}
-                className="px-4 py-2 bg-btnPrimary-light dark:bg-btnPrimary-dark text-white rounded"
+                className="px-2 py-1 bg-btnPrimary-light dark:bg-btnPrimary-dark text-white rounded"
               >
                 Skicka
               </button>

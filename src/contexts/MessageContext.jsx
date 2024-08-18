@@ -1,14 +1,15 @@
 import { createContext, useState, useEffect } from "react";
 import { useAuth } from "@hooks/useContextHooks";
 import { v4 as uuidv4 } from "uuid";
+import useLocalStorage from "@hooks/useLocalStorage";
 
 const MessageContext = createContext();
 
 export const MessageProvider = ({ children }) => {
-  const API_URL = "https://chatify-api.up.railway.app";
+  const API_URL = import.meta.env.VITE_APP_API_URL;
   const { user, jwtToken } = useAuth();
   const [messages, setMessages] = useState([]);
-  const [currentConversation, setCurrentConversation] = useState(null);
+  const [activeConversation, setActiveConversation] = useState(null);
 
   // fetch messages connected to conversation id
   const fetchConversation = async (conversationId) => {
@@ -102,8 +103,29 @@ export const MessageProvider = ({ children }) => {
     }
   };
 
-  // Invite user to new chat -- RENMAE?? createInvite??
-  const handleInvite = async (userId) => {
+  // Invite user to new chat
+  const handleInvite = async (userId, existingConversationId = null) => {
+    const conId = existingConversationId || uuidv4();
+    try {
+      const response = await fetch(`${API_URL}/invite/${userId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ conversationId: conId }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return conId;
+      }
+      throw new Error("Invitation Failed");
+    } catch (error) {
+      console.error("Error with invite", error);
+      throw error;
+    }
+  };
+  /*   const handleInvite = async (userId) => {
     const createInviteUUID = uuidv4();
     try {
       const response = await fetch(`${API_URL}/invite/${userId}`, {
@@ -123,15 +145,15 @@ export const MessageProvider = ({ children }) => {
       console.error("Error with invite", error);
       throw error;
     }
-  };
+  }; */
 
   // export value
   const value = {
     messages,
-    currentConversation,
+    activeConversation,
+    setActiveConversation,
     handleInvite,
     fetchConversation,
-    setCurrentConversation,
     fetchMessages,
     createMessage,
     deleteMessage,

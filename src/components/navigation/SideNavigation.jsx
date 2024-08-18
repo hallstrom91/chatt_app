@@ -1,29 +1,38 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth, useUser } from "@hooks/useContextHooks";
+import { useAuth, useUser, useMessage } from "@hooks/useContextHooks";
 import { useUnreadMessages } from "@hooks/useUnreadMessages";
 import ProfileNavDisplay from "@profile/ProfileNavDisplay";
-import InviteManager from "@invites/InviteManager";
+import InviteResponse from "@invites/InviteResponse";
 import NotificationBell from "@shared/NotificationBell";
 import NavOpen from "@svg/NavOpen.svg?react";
 import NavClose from "@svg/NavClose.svg?react";
 import Bell from "@svg/Bell.svg?react";
 import InviteBell from "@svg/InviteBell.svg?react";
+import useLocalStorage from "@hooks/useLocalStorage";
+import UnreadMessagesPopup from "@invites/UnreadMessagesPopup";
 
 export default function SideNavigation() {
-  const navigate = useNavigate(); // remove?
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
   const unreadMessages = useUnreadMessages();
+  const { activeConversation, setActiveConversation, fetchConversation } =
+    useMessage();
   const {
     invites,
     handleIgnoreInvite,
     ignoredInvites,
+    setIgnoredInvites,
     fetchUserInvites,
     acceptedInvites,
+    setAcceptedInvites,
     handleAcceptInvite,
   } = useUser();
   const [isOpen, setIsOpen] = useState(false);
-  const [showInviteManager, setShowInviteManager] = useState(false);
+  const [showInviteResponse, setShowInviteResponse] = useState(false);
+  //unread msg popup
+  const [showUnreadPopup, setShowUnreadPopup] = useState(false);
+  const [selectedUnreadId, setSelectedUnreadId] = useState(null);
 
   const handleToggle = () => {
     setIsOpen(!isOpen);
@@ -32,18 +41,32 @@ export default function SideNavigation() {
   const handleLogout = () => {
     logout();
     handleToggle();
+    navigate("/", { replace: true });
   };
 
   // collect all invites for user - ADD TIMER?
   useEffect(() => {
     if (user) {
+      const accepted = localStorage.getItem(`${user.id}_acceptedInvites`);
+      setAcceptedInvites(accepted ? JSON.parse(accepted) : []);
+
+      const ignored = localStorage.getItem(`${user.id}_ignoredInvites`);
+      setIgnoredInvites(ignored ? JSON.parse(ignored) : []);
+
+      /* const unread = localStorage.getItem(`${user.id}_unread`) */
+
       fetchUserInvites(user.id);
     }
   }, [user]);
+  /* 
+===========================
+Invite and Message Display
+===========================
+*/
 
   // handle invite manger display / close
   const handleNotificationClick = () => {
-    setShowInviteManager(!showInviteManager);
+    setShowInviteResponse(!showInviteResponse);
   };
 
   // exclude accepted & ignored invites from list
@@ -53,7 +76,23 @@ export default function SideNavigation() {
       !acceptedInvites.includes(invite.conversationId)
   );
 
-  const inviteCounter = filteredInvites.map((invite) => 1);
+  // get length for total invites
+  const inviteCounter = filteredInvites.length;
+
+  // convert to array
+
+  const unreadMessagesArray = Object.values(unreadMessages);
+
+  // count array messages
+  const totalUnreadMessages = unreadMessagesArray.reduce(
+    (total, count) => total + count,
+    0
+  );
+
+  // toggle component display
+  const handleOpenUnread = () => {
+    setShowUnreadPopup(!showUnreadPopup);
+  };
 
   if (!user) {
     return null;
@@ -64,13 +103,14 @@ export default function SideNavigation() {
       <div className="bg-container-light dark:bg-container-dark border border-black/20 dark:border-white/20 rounded-lg fixed top-2 right-4 z-50 flex items-center space-x-1">
         <span className="z-30">
           <NotificationBell
-            notifications={Object.values(unreadMessages)}
+            notifications={[totalUnreadMessages]}
+            onNotificationsClick={handleOpenUnread}
             icon={Bell}
           />
         </span>
         <span className="z-30">
           <NotificationBell
-            notifications={inviteCounter}
+            notifications={[inviteCounter]}
             onNotificationsClick={handleNotificationClick}
             icon={InviteBell}
           />
@@ -97,12 +137,12 @@ export default function SideNavigation() {
         <nav className="p-4 h-full">
           <ul className="mb-4 text-xl font-semibold">
             <li className="my-2">
-              <Link to="/app/profile" onClick={handleToggle}>
+              <Link to="/profile" onClick={handleToggle}>
                 Profil
               </Link>
             </li>
             <li className="my-2">
-              <Link to="/app/chat" onClick={handleToggle}>
+              <Link to="/chat" onClick={handleToggle}>
                 Chatt
               </Link>
             </li>
@@ -117,25 +157,25 @@ export default function SideNavigation() {
           </ul>
         </nav>
       </div>
-
-      {showInviteManager && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-          <div className="bg-container-light dark:bg-container-dark p-4 rounded border text-black dark:text-white border-black/20 dark:border-white/20">
-            <InviteManager
-              invites={filteredInvites}
-              handleIgnoreInvite={handleIgnoreInvite}
-              handleAcceptInvite={handleAcceptInvite}
-            />
-            <div className="flex justify-end pt-5">
-              <button
-                onClick={handleNotificationClick}
-                className="mr-1 px-2 py-1 rounded text-sm font-semibold bg-btnDelete-light dark:bg-btnDelete-dark  text-white"
-              >
-                Stäng
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* popup list for unread messages  */}
+      {showUnreadPopup && (
+        <>
+          <UnreadMessagesPopup
+            unreadMessages={unreadMessages}
+            onClose={() => setShowUnreadPopup(false)}
+          />
+        </>
+      )}
+      {/* popup modul to accept or decline invites from others */}
+      {showInviteResponse && (
+        <>
+          <InviteResponse
+            invites={filteredInvites}
+            handleIgnoreInvite={handleIgnoreInvite}
+            handleAcceptInvite={handleAcceptInvite}
+            onClose={() => setShowInviteResponse(false)}
+          />
+        </>
       )}
     </>
   );

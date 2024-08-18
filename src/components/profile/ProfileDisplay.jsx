@@ -45,12 +45,6 @@ export default function ProfileDisplay() {
                   {user.username}
                 </span>
               </p>
-              <p className="lg:text-sm text-xs font-semibold">
-                Avatar:{" "}
-                <span className="lg:text-sm text-xs tracking-tight font-normal bg-neutral-300 dark:bg-neutral-600 px-2 rounded-sm">
-                  {user.avatar}
-                </span>
-              </p>
               <div className="w-full mt-2 border-2 border-black/20 rounded"></div>
             </div>
           </div>
@@ -71,7 +65,13 @@ export default function ProfileDisplay() {
           </div>
         </div>
         <div className="flex flex-row">
-          <div className="w-3/4 flex justify-start pb-2">input fields here</div>
+          <div className="w-3/4 justify-start pb-2">
+            <p className="text-xs font-bold pb-2">Publik PGP nyckel:</p>
+            <textarea
+              className="resize-none lg:w-96 lg:h-56 border border-black rounded"
+              disabled
+            />
+          </div>
           {/* error test - DELETE THIS */}
           <div className="w-1/4 flex justify-end py-2">
             <button

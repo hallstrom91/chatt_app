@@ -2,20 +2,30 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
 
-export default function CookiePolicy() {
+export default function CookiePolicy({ children }) {
   const [accepted, setAccepted] = useState(false);
   const [showPolicy, setShowPolicy] = useState(!Cookies.get("CookiePolicy"));
 
   // accept cookie consent request
   const acceptCookies = () => {
-    Cookies.set("CookiePolicy", "accepted", { expires: 365 });
+    Cookies.set("CookiePolicy", "accepted", {
+      expires: 365,
+      path: "/",
+      sameSite: "Lax",
+      secure: true,
+    });
     setAccepted(true);
     setShowPolicy(false);
   };
 
   // decline cookie consent request
   const declineCookies = () => {
-    Cookies.set("CookiePolicy", "declined", { expires: 7 });
+    Cookies.set("CookiePolicy", "declined", {
+      expires: 7,
+      path: "/",
+      sameSite: "Lax",
+      secure: true,
+    });
     setAccepted(false);
     setShowPolicy(false);
   };

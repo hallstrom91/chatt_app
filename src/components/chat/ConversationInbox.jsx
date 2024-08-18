@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 import { useAuth, useMessage, useUser } from "@hooks/useContextHooks";
-import { getParticipantsInfo } from "@helpers/ChatUtils";
+import { getParticipantsInfo } from "@utils/ChatUtils";
 import { useUnreadMessages } from "@hooks/useUnreadMessages";
-import ChatInvite from "@invites/ChatInvite";
+import useLocalStorage from "@hooks/useLocalStorage";
+import InviteSender from "@invites/InviteSender";
 import NotificationBell from "@shared/NotificationBell";
 import DefaultAvatar from "@images/DefaultAvatar.svg";
 import AddSign from "@svg/AddSign.svg?react";
 
-export default function ChatHistory({ setActiveConversation, refreshHistory }) {
+export default function ConversationInbox({
+  setActiveConversation,
+  refreshHistory,
+}) {
   const { user } = useAuth();
   const { userList } = useUser();
   const { messages, fetchConversation, handleInvite, createMessage } =
@@ -21,7 +25,7 @@ export default function ChatHistory({ setActiveConversation, refreshHistory }) {
     return null;
   }
 
-  // render & map chat-history for user
+  // render & map unique conversations for user by date (new @ top)
   useEffect(() => {
     if (messages.length > 0) {
       const conversationIds = Array.from(
@@ -80,12 +84,12 @@ export default function ChatHistory({ setActiveConversation, refreshHistory }) {
 
   return (
     <>
-      <section className="pt-1 bg-chatHeader-light dark:bg-chatHeader-dark text-black dark:text-white rounded-lg border border-black/20 dark:border-white/20">
+      <div className="pt-1 bg-chatHeader-light dark:bg-chatHeader-dark text-black dark:text-white rounded-lg border border-black/20 dark:border-white/20">
         <div className="flex justify-end">
           <div className="py-2 pr-4">
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex justify-around rounded-2xl font-semibold text-sm items-center border py-2 pl-1 pr-3"
+              className="flex justify-around rounded-2xl font-semibold text-sm items-center py-2 pl-1 pr-3 bg-btnUpdate-light dark:bg-btnUpdate-dark"
             >
               <AddSign className="icon pr-1 mb" height={15} />
               Ny Chatt
@@ -95,7 +99,7 @@ export default function ChatHistory({ setActiveConversation, refreshHistory }) {
 
         <h1 className="text-start font-semibold pl-4 text-lg">Inkorg</h1>
 
-        <div className="mx-auto border-black dark:border-white">
+        <div className="mx-auto border-black dark:border-white overflow-x-hidden max-h-[60vh]">
           {uniqueConversation.map((conversation) => {
             if (!conversation || conversation.length === 0) {
               return null; // handle empty conversations - ex after invite
@@ -113,14 +117,16 @@ export default function ChatHistory({ setActiveConversation, refreshHistory }) {
                 userList,
                 DefaultAvatar
               );
-
+            // limit avatars display to three pictures
             const limitedAvatars = participantsAvatar.slice(0, 3);
 
+            // limit usernames in groupchat to 30 characters
             const limitedUsernames =
               participantsUsername.length > 30
                 ? participantsUsername.substring(0, 30) + "..."
                 : participantsUsername;
 
+            // message counter for display
             const messageCounter =
               unreadMessages[conversation[0].conversationId] || 0;
 
@@ -131,14 +137,23 @@ export default function ChatHistory({ setActiveConversation, refreshHistory }) {
               >
                 <div className="flex items-center flex-grow mb-2 sm:mb-0">
                   <div className="flex justify-start -space-x-4 w-20 sm:w-24">
-                    {limitedAvatars.map((avatar, index) => (
+                    {limitedAvatars.length > 0 ? (
+                      limitedAvatars.map((avatar, index) => (
+                        <img
+                          key={index}
+                          className="object-scale-down h-8 w-8 lg:h-10 lg:w-10 ring-1 ring-secondary-light dark:ring-secondary-dark rounded-full bg-white"
+                          src={avatar}
+                          alt="User Avatar"
+                        />
+                      ))
+                    ) : (
+                      /* no image to display? display default avatar */
                       <img
-                        key={index}
                         className="object-scale-down h-8 w-8 lg:h-10 lg:w-10 ring-1 ring-secondary-light dark:ring-secondary-dark rounded-full bg-white"
-                        src={avatar}
+                        src={DefaultAvatar}
                         alt="User Avatar"
                       />
-                    ))}
+                    )}
                   </div>
 
                   <div className="flex flex-col ml-4 w-40 sm:w-52 md:w-64 flex-grow">
@@ -162,6 +177,7 @@ export default function ChatHistory({ setActiveConversation, refreshHistory }) {
                 </div>
 
                 <div className="flex items-center justify-end w-full space-x-2">
+                  {/*  display notifier for number of unread (new messages since last response from signedIn user) */}
                   {messageCounter > 0 && (
                     <div className="flex items-center">
                       <NotificationBell notifications={[messageCounter]} />
@@ -184,9 +200,10 @@ export default function ChatHistory({ setActiveConversation, refreshHistory }) {
             );
           })}
         </div>
-      </section>
+      </div>
+      {/* popup module for inviting user to new chat */}
       {isModalOpen && (
-        <ChatInvite
+        <InviteSender
           userList={userList}
           onClose={() => setIsModalOpen(false)}
           onInvite={handleInviteUser}

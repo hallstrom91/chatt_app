@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth, useMessage, useUser } from "@hooks/useContextHooks";
 
 export default function ProfileUpdate() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { deleteAllMessages } = useMessage();
   const { deleteUser, updateUser } = useUser();
@@ -71,8 +73,11 @@ export default function ProfileUpdate() {
 
   const handleDeleteUser = async () => {
     try {
+      // add deleteallmessages first
+      await deleteAllMessages();
       await deleteUser(user.id);
       setConfirmDeleteUser(false);
+      navigate("/", { replace: true });
     } catch (error) {
       console.error(`Failed to delete user ${user.id}:`, error);
     }

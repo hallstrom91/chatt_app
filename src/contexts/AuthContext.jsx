@@ -2,52 +2,28 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
+import useLocalStorage from "@hooks/useLocalStorage";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_APP_API_URL;
+
   const [csrfToken, setCsrfToken] = useState(null);
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
+  const [user, setUser] = useLocalStorage("user", null);
+  const [isAuthenticated, setIsAuthenticated] = useLocalStorage(
+    "isAuthenticated",
+    false
+  );
 
   const [jwtToken, setJwtToken] = useState(() => {
     const token = Cookies.get("token");
     return token || null;
   });
 
-  useEffect(() => {
-    fetchCsrfToken();
-  }, []);
-
-  // fix
-  const AuthController = () => {};
-
-  useEffect(() => {
-    // at mount
-    if (!jwtToken && isTokenExpired(jwtToken)) {
-      console.log("jwt-controller mount");
-      logout();
-    }
-
-    //interval
-    const interval = setInterval(() => {
-      console.log("jwt-controller interval - 60s");
-      const token = Cookies.get("token");
-      if (!token || isTokenExpired(token)) {
-        logout();
-      } else {
-        setJwtToken(token);
-      }
-    }, 30000); // 30s
-    return () => clearInterval(interval);
-  }, [jwtToken]);
-
   // check if JWT is expired
   const isTokenExpired = (token) => {
-    if (!token) return true;
+    console.log("isTokenExpired Used");
     const decodedToken = jwtDecode(token);
     const currentTime = Date.now() / 1000;
     return decodedToken.exp < currentTime;
@@ -56,7 +32,7 @@ export const AuthProvider = ({ children }) => {
   // collect csrftoken
   const fetchCsrfToken = async () => {
     try {
-      const response = await fetch("https://chatify-api.up.railway.app/csrf", {
+      const response = await fetch(`${API_URL}/csrf`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -73,24 +49,23 @@ export const AuthProvider = ({ children }) => {
   // register function
   const register = async (username, password, email, avatar) => {
     try {
-      const response = await fetch(
-        "https://chatify-api.up.railway.app/auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username,
-            password,
-            email,
-            avatar,
-            csrfToken,
-          }),
-        }
-      );
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          email,
+          avatar,
+          csrfToken,
+        }),
+      });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message);
+      if (!response.ok) {
+        throw new Error(data.error || "Registrering misslyckades.");
+      }
       return data;
     } catch (error) {
       throw error;
@@ -100,32 +75,31 @@ export const AuthProvider = ({ children }) => {
   // login function
   const login = async (username, password) => {
     try {
-      const response = await fetch(
-        "https://chatify-api.up.railway.app/auth/token",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password, csrfToken }),
-        }
-      );
+      const response = await fetch(`${API_URL}/auth/token`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password, csrfToken }),
+      });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
       const token = data.token;
       setJwtToken(token);
-      Cookies.set("token", token);
+      Cookies.set("token", token, {
+        expires: 1 / 24,
+        path: "/",
+        sameSite: "Lax",
+        /* secure: true, */
+      });
       const decodedToken = jwtDecode(token);
-      console.log("decodedToken Auth context-api:", decodedToken);
       const userData = {
         id: decodedToken.id,
         username: decodedToken.user,
         avatar: decodedToken.avatar,
         email: decodedToken.email,
       };
-      console.log("userData Auth context-api:", userData);
       setUser(userData);
-      localStorage.setItem("user", JSON.stringify(userData));
       return data;
     } catch (error) {
       throw error;
@@ -134,18 +108,23 @@ export const AuthProvider = ({ children }) => {
 
   // logout and clear values function
   const logout = async () => {
+    console.log("logout function used");
+    if (user && user.id) {
+      localStorage.removeItem(`${user.id}_unread`);
+    }
+    localStorage.removeItem("user");
+    localStorage.removeItem("isAuthenticated");
     setJwtToken(null);
     setUser(null);
     setCsrfToken(null);
     Cookies.remove("token");
-    localStorage.removeItem("user");
-    await fetchCsrfToken();
-    navigate("/");
   };
 
   const value = {
     user,
     jwtToken,
+    isAuthenticated,
+    setIsAuthenticated,
     isTokenExpired,
     fetchCsrfToken,
     register,

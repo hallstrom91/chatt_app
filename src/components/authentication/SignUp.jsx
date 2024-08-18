@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { useAuth } from "@hooks/useContextHooks";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  translateError,
+  validateEmail,
+  validatePassword,
+} from "@utils/authUtils";
 import RegisterClipboard from "@svg/RegisterClipboard.svg?react";
+import ExclamationMark from "@svg/ExclamationMark.svg?react";
 
 export default function SignUp() {
   const { register } = useAuth();
@@ -11,6 +17,7 @@ export default function SignUp() {
   const [userData, setUserData] = useState({
     username: "",
     password: "",
+    confirmPassword: "",
     email: "",
     avatar: "",
   });
@@ -22,7 +29,28 @@ export default function SignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!userData.username || !userData.email || !userData.password) {
+      setError("Alla fält måste fyllas i.");
+      return;
+    }
+    if (userData.password !== userData.confirmPassword) {
+      setError("Lösenorden matchar inte varandra.");
+      return;
+    }
+
+    if (!validateEmail(userData.email)) {
+      setError("Ogiltig e-postadress.");
+      return;
+    }
+
+    if (!validatePassword(userData.password)) {
+      setError(
+        "Lösenordet måste vara sex tecken långt, innehålla en siffra och ett specialtecken."
+      );
+      return;
+    }
     try {
+      setError(""); // move?
       const data = await register(
         userData.username,
         userData.password,
@@ -31,18 +59,26 @@ export default function SignUp() {
       );
       setSuccess("Registrering lyckad.");
       console.info("API Response - Register:", data);
-      setUserData({ username: "", password: "", email: "", avatar: "" });
-      setTimeout(() => {
+      setUserData({
+        username: "",
+        password: "",
+        confirmPassword: "",
+        email: "",
+        avatar: "",
+      });
+      const successTimer = setTimeout(() => {
         setSuccess("");
-      }, 3000);
-      // add fetchCSrfToken() here or context?
-      navigate("/");
+        navigate("/");
+      }, 7000); //7s wait and then redirect
+      return () => clearTimeout(successTimer);
     } catch (error) {
-      console.error("register failed", error.message);
-      setError("Registrering misslyckad");
-      setTimeout(() => {
+      const translatedError = translateError(error.message);
+      console.error("register failed", translatedError);
+      setError(translatedError);
+      const errorTimer = setTimeout(() => {
         setError("");
-      }, 3000);
+      }, 7000);
+      return () => clearTimeout(errorTimer);
     }
   };
 
@@ -57,7 +93,7 @@ export default function SignUp() {
             <RegisterClipboard className="icon ml-2" height={35} />
           </div>
           <div className="grid justify-items-center px-5">
-            <div className="px-4 mb-3">
+            <div className="relative px-4 mb-3 flex items-center">
               <label
                 htmlFor="register-username"
                 className="tracking-tighter font-semibold hidden"
@@ -74,8 +110,16 @@ export default function SignUp() {
                 onChange={handleChange}
                 className="rounded block px-2 py-1 tracking-tight text-black placeholder-neutral-500"
               />
+              <span className="absolute right-0 top-1 transform translate-y-0 translate-x-3 pr-2">
+                {userData.username === "" && error && (
+                  <ExclamationMark
+                    height={20}
+                    className="fill-btnDelete-light"
+                  />
+                )}
+              </span>
             </div>
-            <div className="px-4 mb-3 justify-center">
+            <div className="relative px-4 mb-3 flex items-center">
               <label
                 htmlFor="register-password"
                 className="tracking-tighter font-semibold hidden"
@@ -92,8 +136,34 @@ export default function SignUp() {
                 onChange={handleChange}
                 className="rounded block px-2 py-1 tracking-tight text-black placeholder-neutral-500"
               />
+              <span className="absolute right-0 top-1 transform translate-y-0 translate-x-3 pr-2">
+                {userData.password === "" && error && (
+                  <ExclamationMark
+                    height={20}
+                    className="fill-btnDelete-light"
+                  />
+                )}
+              </span>
             </div>
             <div className="px-4 mb-3 justify-center">
+              <label
+                htmlFor="confirm-password"
+                className="tracking-tighter font-semibold hidden"
+              >
+                Bekräfta Lösenord:
+              </label>
+              <input
+                type="password"
+                name="confirmPassword"
+                id="confirm-password"
+                autoComplete="new-password"
+                placeholder="Bekräfta Lösenord"
+                value={userData.confirmPassword}
+                onChange={handleChange}
+                className="rounded block px-2 py-1 tracking-tight text-black placeholder-neutral-500"
+              />
+            </div>
+            <div className="relative px-4 mb-3 flex items-center">
               <label
                 htmlFor="register-email"
                 className="tracking-tighter font-semibold hidden"
@@ -110,8 +180,16 @@ export default function SignUp() {
                 onChange={handleChange}
                 className="rounded block px-2 py-1 tracking-tight text-black placeholder-neutral-500"
               />
+              <span className="absolute right-0 top-1 transform translate-y-0 translate-x-3 pr-2">
+                {userData.email === "" && error && (
+                  <ExclamationMark
+                    height={20}
+                    className="fill-btnDelete-light"
+                  />
+                )}
+              </span>
             </div>
-            <div className="px-4 mb-3 justify-center">
+            <div className="relative px-4 mb-3 flex items-center">
               <label
                 htmlFor="register-avatar"
                 className="tracking-tighter font-semibold hidden"
@@ -144,15 +222,25 @@ export default function SignUp() {
           </div>
         </div>
         {error && (
-          <p className="text-font-light dark:text-font-dark text-center">
-            {error}
+          <p className="text-sm font-bold text-black dark:text-white flex justify-center items-center break-words">
+            {error}{" "}
           </p>
         )}
         {success && (
-          <p className="text-font-light dark:text-font-dark text-center">
+          <p className="text-sm font-bold text-black dark:text-white  flex justify-center items-center">
             {success}
           </p>
         )}
+        <div className="justify-start p-2 mt-4">
+          <p className="text-xs font-semibold text-black dark:text-white">
+            Lösenordet måste innehålla:
+          </p>
+          <p className="text-xs tracking-tighter">Minst sex tecken.</p>
+          <p className="text-xs tracking-tighter">Innehålla en siffra.</p>
+          <p className="text-xs tracking-tighter">
+            Innehålla ett specialtecken
+          </p>
+        </div>
       </section>
     </>
   );
