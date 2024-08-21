@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { useAuth, useMessage, useUser } from "@hooks/useContextHooks";
 import { getParticipantsInfo } from "@utils/ChatUtils";
 import { useUnreadMessages } from "@hooks/useUnreadMessages";
-import useLocalStorage from "@hooks/useLocalStorage";
+import useSessionStorage from "@hooks/useSessionStorage";
 import InviteSender from "@invites/InviteSender";
 import NotificationBell from "@shared/NotificationBell";
 import DefaultAvatar from "@images/DefaultAvatar.svg";
 import AddSign from "@svg/AddSign.svg?react";
 
 export default function ConversationInbox({
-  setActiveConversation,
+  openConversation,
   refreshHistory,
 }) {
   const { user } = useAuth();
@@ -17,6 +17,7 @@ export default function ConversationInbox({
   const { messages, fetchConversation, handleInvite, createMessage } =
     useMessage();
   const [uniqueConversation, setUniqueConversation] = useState([]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const unreadMessages = useUnreadMessages();
 
@@ -126,9 +127,11 @@ export default function ConversationInbox({
                 ? participantsUsername.substring(0, 30) + "..."
                 : participantsUsername;
 
-            // message counter for display
+            // message counter for display of each unique chat
+
+            const unreadData = unreadMessages[conversation[0].conversationId];
             const messageCounter =
-              unreadMessages[conversation[0].conversationId] || 0;
+              unreadData && unreadData.count ? unreadData.count : 0;
 
             return (
               <div
@@ -186,7 +189,7 @@ export default function ConversationInbox({
 
                   <button
                     onClick={() =>
-                      setActiveConversation({
+                      openConversation({
                         conversationId: lastMessage.conversationId,
                         messages: conversation,
                       })

@@ -4,16 +4,17 @@ import NotificationBell from "@shared/NotificationBell";
 
 export default function InviteResponse({
   invites = [],
-  handleIgnoreInvite,
-  handleAcceptInvite,
   onClose,
+  handleInvite,
+  /*   handleIgnoreInvite,
+    handleAcceptInvite, */
 }) {
   const { user } = useAuth();
   const { createMessage } = useMessage();
 
   // handle invite decline
   const handleIgnore = (conversationId) => {
-    handleIgnoreInvite(conversationId);
+    handleInvite(conversationId);
   };
 
   // handle invite accept
@@ -23,7 +24,7 @@ export default function InviteResponse({
       conversationId: conversationId,
     };
     createMessage(message);
-    handleAcceptInvite(conversationId);
+    handleInvite(conversationId);
   };
 
   return (

@@ -4,7 +4,7 @@ import { useAuth } from "@hooks/useContextHooks";
 import SignIn from "@authentication/SignIn";
 
 export default function Login() {
-  const { isAuthenticated, fetchCsrfToken } = useAuth();
+  const { isAuthenticated, fetchCsrfToken, logout } = useAuth();
   const navigate = useNavigate();
 
   const getCSRF = async () => {
@@ -17,6 +17,7 @@ export default function Login() {
       navigate("/profile", { replace: true });
       console.log("You have been redirected by Login page.");
     } else {
+      logout();
       getCSRF();
     }
   }, []);

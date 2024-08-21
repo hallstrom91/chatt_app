@@ -4,8 +4,7 @@ import { useAuth } from "@hooks/useContextHooks";
 import SignInLock from "@svg/SignInLock.svg?react";
 
 export default function SignIn() {
-  const { login, logout, fetchCrsfToken, isAuthenticated, jwtToken } =
-    useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [userData, setUserData] = useState({

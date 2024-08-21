@@ -14,6 +14,23 @@ export default function App() {
   return (
     <>
       <AuthProvider>
+        <ThemeProvider>
+          <ErrorBoundary>
+            <CookiePolicyHOC>
+              <AllRoutes />
+              <Footer />
+            </CookiePolicyHOC>
+          </ErrorBoundary>
+        </ThemeProvider>
+      </AuthProvider>
+    </>
+  );
+}
+
+/* export default function App() {
+  return (
+    <>
+      <AuthProvider>
         <UserProvider>
           <MessageProvider>
             <ThemeProvider>
@@ -30,3 +47,4 @@ export default function App() {
     </>
   );
 }
+ */

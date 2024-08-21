@@ -1,7 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import { useAuth } from "@hooks/useContextHooks";
 import { v4 as uuidv4 } from "uuid";
-import useLocalStorage from "@hooks/useLocalStorage";
 
 const MessageContext = createContext();
 
@@ -33,7 +32,6 @@ export const MessageProvider = ({ children }) => {
   };
 
   // fetch all messages for user
-
   const fetchMessages = async () => {
     try {
       const response = await fetch(`${API_URL}/messages`, {
@@ -125,27 +123,6 @@ export const MessageProvider = ({ children }) => {
       throw error;
     }
   };
-  /*   const handleInvite = async (userId) => {
-    const createInviteUUID = uuidv4();
-    try {
-      const response = await fetch(`${API_URL}/invite/${userId}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${jwtToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ conversationId: createInviteUUID }),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        return createInviteUUID;
-      }
-      throw new Error("Invitation Failed");
-    } catch (error) {
-      console.error("Error with invite", error);
-      throw error;
-    }
-  }; */
 
   // export value
   const value = {

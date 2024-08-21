@@ -3,19 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import useLocalStorage from "@hooks/useLocalStorage";
+import useSessionStorage from "@hooks/useSessionStorage";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const API_URL = import.meta.env.VITE_API_URL;
-
   const [csrfToken, setCsrfToken] = useState(null);
+  // switch 2 sessionStorage ?
   const [user, setUser] = useLocalStorage("user", null);
-  const [isAuthenticated, setIsAuthenticated] = useLocalStorage(
+  const [isAuthenticated, setIsAuthenticated] = useSessionStorage(
     "isAuthenticated",
     false
   );
-
   const [jwtToken, setJwtToken] = useState(() => {
     const token = Cookies.get("token");
     return token || null;
@@ -100,6 +100,7 @@ export const AuthProvider = ({ children }) => {
         email: decodedToken.email,
       };
       setUser(userData);
+      setIsAuthenticated(true);
       return data;
     } catch (error) {
       throw error;
@@ -112,8 +113,7 @@ export const AuthProvider = ({ children }) => {
     if (user && user.id) {
       localStorage.removeItem(`${user.id}_unread`);
     }
-    localStorage.removeItem("user");
-    localStorage.removeItem("isAuthenticated");
+    setIsAuthenticated(false);
     setJwtToken(null);
     setUser(null);
     setCsrfToken(null);

@@ -1,7 +1,15 @@
 import { jwtDecode } from "jwt-decode";
 
 // auth controller function - protectedRoute
-export const checkToken = (user, token, onAuthFail, onAuthSuccess) => {
+export const checkToken = (user, token, onAuthFail) => {
+  // if isAuthenticated session value is missing or false - logout
+  const sessionAuth = sessionStorage.getItem("isAuthenticated");
+  if (sessionAuth === null || sessionAuth === "false") {
+    console.log("IsAuth missing or false");
+    onAuthFail();
+    return;
+  }
+
   // if token is missing, logout and redirect
   if (!token) {
     console.log("check token - token missing");
@@ -30,9 +38,6 @@ export const checkToken = (user, token, onAuthFail, onAuthSuccess) => {
     onAuthFail();
     return; // stop function
   }
-
-  // if all values are valid and correct - access granted
-  onAuthSuccess();
 };
 
 // translate API response for register

@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import { useAuth } from "@hooks/useContextHooks";
 import useLocalStorage from "@hooks/useLocalStorage";
+
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
@@ -8,15 +9,6 @@ export const UserProvider = ({ children }) => {
   const { user, jwtToken, logout } = useAuth();
   const [userList, setUserList] = useState([]);
   const [invites, setInvites] = useState([]);
-
-  const [ignoredInvites, setIgnoredInvites] = useLocalStorage(
-    user ? `${user.id}_ignoredInvites` : null,
-    []
-  );
-  const [acceptedInvites, setAcceptedInvites] = useLocalStorage(
-    user ? `${user.id}_acceptedInvites` : null,
-    []
-  );
 
   // fetch all users in app - for friend req etc..
   const fetchAllUsers = async () => {
@@ -108,29 +100,30 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  // accept invite functions
-
-  const handleAcceptInvite = (conversationId) => {
-    const updatedAcceptedInvites = [...acceptedInvites, conversationId];
-    setAcceptedInvites(updatedAcceptedInvites);
+  // function to remove accepted or ignored invite.
+  const removeUserInvite = async (conversationId) => {
+    // filter out the selected invite for removal
+    const updatedInvites = invites.filter(
+      (invite) => invite.conversationId !== conversationId
+    );
+    // update state
+    setInvites(updatedInvites);
+    // send updated invite-data to API
+    const updateData = { invite: JSON.stringify(updatedInvites) };
+    await updateUser(user.id, updateData);
   };
 
-  const handleIgnoreInvite = (conversationId) => {
-    const updatedIgnoredInvites = [...ignoredInvites, conversationId];
-    setIgnoredInvites(updatedIgnoredInvites);
+  // function to handle invites, accept / ignore and remove invite from API.
+  const handleInviteResponse = async (conversationId) => {
+    await removeUserInvite(conversationId);
   };
 
   // export values
   const value = {
     userList,
     invites,
-    ignoredInvites,
-    setIgnoredInvites,
-    acceptedInvites,
-    setAcceptedInvites,
-    handleAcceptInvite,
-    handleIgnoreInvite,
     fetchUserInvites,
+    handleInviteResponse,
     fetchAllUsers,
     fetchUserById,
     updateUser,

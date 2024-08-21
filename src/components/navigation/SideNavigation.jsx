@@ -1,38 +1,26 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth, useUser, useMessage } from "@hooks/useContextHooks";
+import { useAuth, useUser } from "@hooks/useContextHooks";
 import { useUnreadMessages } from "@hooks/useUnreadMessages";
 import ProfileNavDisplay from "@profile/ProfileNavDisplay";
 import InviteResponse from "@invites/InviteResponse";
 import NotificationBell from "@shared/NotificationBell";
+import useSessionStorage from "@hooks/useSessionStorage";
+import UnreadMessagesPopup from "@invites/UnreadMessagesPopup";
 import NavOpen from "@svg/NavOpen.svg?react";
 import NavClose from "@svg/NavClose.svg?react";
 import Bell from "@svg/Bell.svg?react";
 import InviteBell from "@svg/InviteBell.svg?react";
-import useLocalStorage from "@hooks/useLocalStorage";
-import UnreadMessagesPopup from "@invites/UnreadMessagesPopup";
 
 export default function SideNavigation() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const unreadMessages = useUnreadMessages();
-  const { activeConversation, setActiveConversation, fetchConversation } =
-    useMessage();
-  const {
-    invites,
-    handleIgnoreInvite,
-    ignoredInvites,
-    setIgnoredInvites,
-    fetchUserInvites,
-    acceptedInvites,
-    setAcceptedInvites,
-    handleAcceptInvite,
-  } = useUser();
+  const { invites, fetchUserInvites, handleInviteResponse } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const [showInviteResponse, setShowInviteResponse] = useState(false);
   //unread msg popup
   const [showUnreadPopup, setShowUnreadPopup] = useState(false);
-  const [selectedUnreadId, setSelectedUnreadId] = useState(null);
 
   const handleToggle = () => {
     setIsOpen(!isOpen);
@@ -47,14 +35,6 @@ export default function SideNavigation() {
   // collect all invites for user - ADD TIMER?
   useEffect(() => {
     if (user) {
-      const accepted = localStorage.getItem(`${user.id}_acceptedInvites`);
-      setAcceptedInvites(accepted ? JSON.parse(accepted) : []);
-
-      const ignored = localStorage.getItem(`${user.id}_ignoredInvites`);
-      setIgnoredInvites(ignored ? JSON.parse(ignored) : []);
-
-      /* const unread = localStorage.getItem(`${user.id}_unread`) */
-
       fetchUserInvites(user.id);
     }
   }, [user]);
@@ -69,25 +49,20 @@ Invite and Message Display
     setShowInviteResponse(!showInviteResponse);
   };
 
-  // exclude accepted & ignored invites from list
-  const filteredInvites = (invites || []).filter(
-    (invite) =>
-      !ignoredInvites.includes(invite.conversationId) &&
-      !acceptedInvites.includes(invite.conversationId)
-  );
-
   // get length for total invites
-  const inviteCounter = filteredInvites.length;
+  const inviteCounter = (invites || []).length;
 
   // convert to array
-
   const unreadMessagesArray = Object.values(unreadMessages);
 
-  // count array messages
-  const totalUnreadMessages = unreadMessagesArray.reduce(
-    (total, count) => total + count,
-    0
-  );
+  // filter out all conversations with 0 count
+  const totalUnreadMessages = unreadMessagesArray.reduce((total, item) => {
+    // if item is object with count prop, add the count to the total
+    if (typeof item === "object" && item !== null && "count" in item) {
+      return total + item.count;
+    }
+    return total;
+  }, 0);
 
   // toggle component display
   const handleOpenUnread = () => {
@@ -170,9 +145,8 @@ Invite and Message Display
       {showInviteResponse && (
         <>
           <InviteResponse
-            invites={filteredInvites}
-            handleIgnoreInvite={handleIgnoreInvite}
-            handleAcceptInvite={handleAcceptInvite}
+            invites={invites}
+            handleInvite={handleInviteResponse}
             onClose={() => setShowInviteResponse(false)}
           />
         </>
