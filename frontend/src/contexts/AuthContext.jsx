@@ -4,13 +4,14 @@ import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import useLocalStorage from "@hooks/useLocalStorage";
 import useSessionStorage from "@hooks/useSessionStorage";
+import DOMPurify from "dompurify";
+import * as Sentry from "@sentry/react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const API_URL = import.meta.env.VITE_API_URL;
   const [csrfToken, setCsrfToken] = useState(null);
-  // switch 2 sessionStorage ?
   const [user, setUser] = useLocalStorage("user", null);
   const [isAuthenticated, setIsAuthenticated] = useSessionStorage(
     "isAuthenticated",
@@ -23,7 +24,6 @@ export const AuthProvider = ({ children }) => {
 
   // check if JWT is expired
   const isTokenExpired = (token) => {
-    console.log("isTokenExpired Used");
     const decodedToken = jwtDecode(token);
     const currentTime = Date.now() / 1000;
     return decodedToken.exp < currentTime;
@@ -41,11 +41,10 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
       setCsrfToken(data.csrfToken);
     } catch (error) {
-      console.error("Error fetching CSRF token", error);
+      Sentry.captureException(error);
     }
   };
 
-  // img test link - https://i.pravatar.cc/150?img=63
   // register function
   const register = async (username, password, email, avatar) => {
     try {
@@ -68,6 +67,7 @@ export const AuthProvider = ({ children }) => {
       }
       return data;
     } catch (error) {
+      Sentry.captureException(error);
       throw error;
     }
   };
@@ -83,7 +83,10 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ username, password, csrfToken }),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message);
+      if (!response.ok) {
+        throw new Error(data.error || "Inloggning misslyckades.");
+      }
+
       const token = data.token;
       setJwtToken(token);
       Cookies.set("token", token, {
@@ -103,13 +106,13 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(true);
       return data;
     } catch (error) {
+      Sentry.captureException(error);
       throw error;
     }
   };
 
   // logout and clear values function
   const logout = async () => {
-    console.log("logout function used");
     if (user && user.id) {
       localStorage.removeItem(`${user.id}_unread`);
     }

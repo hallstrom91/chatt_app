@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useMessage } from "@hooks/useContextHooks";
 import { useNavigate } from "react-router-dom";
-import DefaultAvatar from "@images/DefaultAvatar.svg";
 import { useUnreadMessages } from "@hooks/useUnreadMessages";
+import { DefaultAvatar, NavClose } from "@utils/svgIcons";
+import * as Sentry from "@sentry/react";
 
 export default function UnreadMessagesPopup({ unreadMessages, onClose }) {
   const { setActiveConversation, fetchConversation } = useMessage();
   const navigate = useNavigate();
+  const closeRef = useRef(null);
 
   // handle selection of specific unread message/conversation
   const handleMessageClick = async (conversationId) => {
@@ -19,22 +21,43 @@ export default function UnreadMessagesPopup({ unreadMessages, onClose }) {
       });
       onClose();
     } catch (error) {
-      console.error("Failed to fetch conversation", error);
+      Sentry.captureException(error);
     }
   };
 
+  const hasUnreadMessages = Object.values(unreadMessages).some(
+    (details) => details.count > 0
+  );
+
+  // close when click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (closeRef.current && !closeRef.current.contains(event.target)) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [onClose]);
+
   return (
     <>
-      <div className="absolute top-[4rem] right-2 border rounded-lg z-40 p-2 bg-container-light dark:bg-container-dark text-black dark:text-white border-black/20 dark:border-white/20 ">
+      <div
+        ref={closeRef}
+        className="absolute top-[4rem] right-2 border rounded-lg z-40 p-2 bg-container-light dark:bg-container-dark text-black dark:text-white border-black/20 dark:border-white/20 "
+      >
+        <h3 className="text-sm font-bold mb-2 mt-3">Nya Meddelanden</h3>
         <button
           onClick={onClose}
           className="absolute top-2 right-2 text-xs font-semibold"
         >
-          Stäng
+          <NavClose height={15} className="icon" />
         </button>
-        <h3 className="text-base font-bold mb-2 mt-3">Olästa meddelanden</h3>
-        {Object.keys(unreadMessages).length === 0 ? (
-          <p>Inget nytt här.</p>
+        {Object.keys(unreadMessages).length === 0 || !hasUnreadMessages ? (
+          <p className="text-xs">Inga olästa meddelanden.</p>
         ) : (
           <ul className="pl-4 w-52">
             {Object.entries(unreadMessages)

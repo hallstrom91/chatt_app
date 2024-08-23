@@ -3,6 +3,7 @@ import { useAuth, useMessage, useUser } from "@hooks/useContextHooks";
 import ConversationDisplay from "@chat/ConversationDisplay";
 import ConversationInbox from "@chat/ConversationInbox";
 import Loader from "@shared/Loader";
+import * as Sentry from "@sentry/react";
 
 export default function Chat() {
   const { user } = useAuth();
@@ -14,33 +15,24 @@ export default function Chat() {
   } = useMessage();
   const { fetchAllUsers } = useUser();
   const [updateIndicator, setUpdateIndicator] = useState(0);
-  const [isLoadingInbox, setIsLoadingInbox] = useState(false);
-  const [isLoadingChatRender, setIsLoadingChatRender] = useState(false);
-
-  /*   useEffect(() => {
-    // get a mount after login
-    if (user) {
-      fetchMessages();
-      fetchAllUsers();
-    }
-  }, []); */
+  const [isLoadingChat, setIsLoadingChat] = useState(false);
 
   useEffect(() => {
     if (user) {
-      setIsLoadingInbox(true);
+      setIsLoadingChat(true);
       Promise.all([fetchMessages(), fetchAllUsers()])
         .then(() => {
           setIsLoadingInbox(false);
         })
         .catch((error) => {
-          console.error("Failed to fetch inital data", error);
-          setIsLoadingInbox(false);
+          Sentry.captureException(error);
+          setIsLoadingChat(false);
         });
     }
   }, [user]);
 
   const handleSetActiveConversation = async (conversation) => {
-    setIsLoadingChatRender(true);
+    setIsLoadingChat(true);
     try {
       const openConversation = await fetchConversation(
         conversation.conversationId
@@ -51,14 +43,13 @@ export default function Chat() {
         messages: openConversation,
       });
     } catch (error) {
-      console.error("Failed to open conversation:", error);
+      Sentry.captureException(error);
     } finally {
-      setIsLoadingChatRender(false);
+      setIsLoadingChat(false);
     }
   };
 
   const handleRefreshConversation = async (message) => {
-    setIsLoadingChatRender(true);
     try {
       const updatedConversation = await fetchConversation(
         message.conversationId
@@ -77,15 +68,13 @@ export default function Chat() {
       });
       setUpdateIndicator((prev) => prev + 1);
     } catch (error) {
-      console.error("Failed to update chat:", error);
-    } finally {
-      setIsLoadingChatRender(false);
+      Sentry.captureException(error);
     }
   };
 
   return (
     <>
-      {isLoadingInbox ? (
+      {isLoadingChat ? (
         <div className="flex justify-center items-center h-screen">
           <Loader />
         </div>
@@ -99,17 +88,11 @@ export default function Chat() {
               />
             </div>
             <div className="w-full lg:w-4/6 lg:pl-1 mb-4 order-1 md:order-none">
-              {isLoadingChatRender ? (
-                <div className="">
-                  <Loader />
-                </div>
-              ) : (
-                activeConversation && (
-                  <ConversationDisplay
-                    conversation={activeConversation}
-                    refreshConversation={handleRefreshConversation}
-                  />
-                )
+              {activeConversation && (
+                <ConversationDisplay
+                  conversation={activeConversation}
+                  refreshConversation={handleRefreshConversation}
+                />
               )}
             </div>
           </div>

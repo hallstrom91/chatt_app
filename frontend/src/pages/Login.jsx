@@ -9,13 +9,11 @@ export default function Login() {
 
   const getCSRF = async () => {
     await fetchCsrfToken();
-    console.log("fetchCsrfToken @ login");
   };
 
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/profile", { replace: true });
-      console.log("You have been redirected by Login page.");
     } else {
       logout();
       getCSRF();

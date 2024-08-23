@@ -4,12 +4,12 @@ import {
   formatDate,
   getParticipantsInfo,
   getUserInfoById,
-} from "@utils/ChatUtils";
-import DefaultAvatar from "@images/DefaultAvatar.svg";
-import ChatInfo from "@svg/ChatInfo.svg?react";
-import TrashCan from "@svg/TrashCan.svg?react";
-import AddSign from "@svg/AddSign.svg?react";
-import InviteSender from "@invites/InviteSender";
+} from "@utils/chatUtils";
+import { DefaultAvatar, ChatInfo, TrashCan, AddSign } from "@utils/svgIcons";
+import InfoPopup from "./InfoPopup";
+import InviteSender from "@notifications/InviteSender";
+import DOMPurify from "dompurify";
+import * as Sentry from "@sentry/react";
 
 export default function ConversationDisplay({
   conversation,
@@ -20,37 +20,41 @@ export default function ConversationDisplay({
   const { userList } = useUser();
   const [newMessage, setNewMessage] = useState("");
   const messageEndRef = useRef(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
 
-  const handleOpenInviter = () => {
-    setIsModalOpen(true);
+  // unique conversation information
+  const handleOpenInfoModal = () => {
+    setIsInfoModalOpen(!isInfoModalOpen);
   };
+
   // handle submit of new message
   const handleSubmitMessage = async () => {
     if (newMessage.trim()) {
       try {
+        // sanitize input
+        const sanitizedMessage = DOMPurify.sanitize(newMessage);
+
         const submittedMsg = await createMessage({
-          text: newMessage,
+          text: sanitizedMessage,
           conversationId: conversation.conversationId,
         });
         setNewMessage("");
         if (submittedMsg) {
           refreshConversation(submittedMsg);
-        } else {
-          console.error("Submitted message is undefined.");
         }
       } catch (error) {
-        console.error("Failed to submit message:", error);
+        Sentry.captureException(error);
       }
     }
   };
+
   // handle delete of message removal one by one in active chat
   const handleDeleteMessage = async (msgId) => {
     try {
       await deleteMessage(msgId);
       refreshConversation(conversation);
     } catch (error) {
-      console.error("Failed to delete message", error);
+      Sentry.captureException(error);
     }
   };
   // Collect username for other users
@@ -120,9 +124,15 @@ export default function ConversationDisplay({
                 </div>
                 {/* display friends names */}
                 <div className="flex">
-                  <h1 className="font-semibold text-sm lg:text-lg">
-                    {limitUsernames}
-                  </h1>
+                  {limitUsernames && limitUsernames.length > 0 ? (
+                    <h1 className="font-semibold text-sm lg:text-lg">
+                      {limitUsernames}
+                    </h1>
+                  ) : (
+                    <h1 className="font-semibold text-sm lg:text-lg">
+                      Inbjudan skickad, inväntar svar...
+                    </h1>
+                  )}
                 </div>
                 <div className="flex justify-end w-full items-center">
                   {/* add more users to the chat (invite) */}
@@ -130,8 +140,12 @@ export default function ConversationDisplay({
                     <AddSign className="icon pr-1 mb" height={15} />
                   </div>
                   {/* view current chat info btn (conversationId, userIds etc) */}
-                  <div className="py-1 pr-1">
-                    <ChatInfo className="icon" height={20} />
+                  <div className="relative inline-block py-1 pr-1">
+                    <ChatInfo
+                      className="icon"
+                      height={20}
+                      onClick={handleOpenInfoModal}
+                    />
                   </div>
                 </div>
               </div>
@@ -203,7 +217,12 @@ export default function ConversationDisplay({
           </div>
         </div>
       </section>
-      {/* test test test  ADD INVITE FOR EXTRA USERS*/}
+      {isInfoModalOpen && (
+        <InfoPopup
+          onClose={() => setIsInfoModalOpen(false)}
+          chatInfo={conversation}
+        />
+      )}
     </>
   );
 }

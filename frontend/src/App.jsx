@@ -1,50 +1,53 @@
-import { useState } from "react";
-import { Routes, Route } from "react-router-dom";
-import "./App.css";
+import { useState, useEffect } from "react";
+import { useTheme } from "@hooks/useContextHooks";
 import Footer from "@layout/Footer";
-import { ThemeProvider } from "@contexts/ThemeContext";
-import { AuthProvider } from "@contexts/AuthContext";
-import { UserProvider } from "@contexts/UserContext";
-import { MessageProvider } from "@contexts/MessageContext";
 import ErrorBoundary from "@utils/ErrorBoundary";
 import CookiePolicyHOC from "@utils/CookiePolicyHOC";
 import AllRoutes from "./routes/AllRoutes";
+import Cookies from "js-cookie";
+import "./App.css";
 
 export default function App() {
-  return (
-    <>
-      <AuthProvider>
-        <ThemeProvider>
-          <ErrorBoundary>
-            <CookiePolicyHOC>
-              <AllRoutes />
-              <Footer />
-            </CookiePolicyHOC>
-          </ErrorBoundary>
-        </ThemeProvider>
-      </AuthProvider>
-    </>
-  );
-}
+  const { theme, setTheme } = useTheme();
 
-/* export default function App() {
+  useEffect(() => {
+    // check user sys-settings
+    const userHasDarkMode = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    // check user cookie
+    const savedTheme = Cookies.get("theme");
+
+    if (!savedTheme) {
+      const initialTheme = userHasDarkMode ? "dark" : "light";
+      Cookies.set("theme", initialTheme, {
+        expires: 365,
+        path: "/",
+        sameSite: "Lax",
+      });
+      setTheme(initialTheme);
+    } else {
+      setTheme(savedTheme);
+    }
+
+    const currentTheme = savedTheme || (userHasDarkMode ? "dark" : "light");
+    // elements class
+    document.documentElement.classList.remove("light", "dark");
+    document.documentElement.classList.add(theme);
+
+    //body class
+    document.body.classList.remove("bg-light", "bg-dark");
+    document.body.classList.add(theme === "light" ? "bg-light" : "bg-dark");
+  }, [theme]);
+
   return (
     <>
-      <AuthProvider>
-        <UserProvider>
-          <MessageProvider>
-            <ThemeProvider>
-              <ErrorBoundary>
-                <CookiePolicyHOC>
-                  <AllRoutes />
-                  <Footer />
-                </CookiePolicyHOC>
-              </ErrorBoundary>
-            </ThemeProvider>
-          </MessageProvider>
-        </UserProvider>
-      </AuthProvider>
+      <ErrorBoundary>
+        <CookiePolicyHOC>
+          <AllRoutes />
+          <Footer />
+        </CookiePolicyHOC>
+      </ErrorBoundary>
     </>
   );
 }
- */

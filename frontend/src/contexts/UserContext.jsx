@@ -23,7 +23,7 @@ export const UserProvider = ({ children }) => {
       const data = await response.json();
       setUserList(data);
     } catch (error) {
-      console.error("Failed to fetch list of all users:", error);
+      Sentry.captureException(error);
     }
   };
 
@@ -40,7 +40,7 @@ export const UserProvider = ({ children }) => {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error("Failed to fetch user by id:", error);
+      Sentry.captureException(error);
     }
   };
 
@@ -56,10 +56,9 @@ export const UserProvider = ({ children }) => {
         body: JSON.stringify({ userId: userId, updatedData: updateData }),
       });
       const data = await response.json();
-      console.log("updated user success", data);
       return data;
     } catch (error) {
-      console.error(`Failed to update user ${userId}:`, error);
+      Sentry.captureException(error);
     }
   };
 
@@ -77,7 +76,7 @@ export const UserProvider = ({ children }) => {
         logout();
       }
     } catch (error) {
-      console.error(`Failed to delete user ${userId}:`, error);
+      Sentry.captureException(error);
     }
   };
 
@@ -93,8 +92,7 @@ export const UserProvider = ({ children }) => {
           const parsedInvites = JSON.parse(userData.invite);
           setInvites(parsedInvites);
         } catch (error) {
-          console.error("Failed to parse invites:", error);
-          console.info("Raw invite data:", userData.invite);
+          Sentry.captureException(error);
         }
       }
     }

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useAuth, useMessage, useUser } from "@hooks/useContextHooks";
-import { getParticipantsInfo } from "@utils/ChatUtils";
+import { getParticipantsInfo } from "@utils/chatUtils";
 import { useUnreadMessages } from "@hooks/useUnreadMessages";
-import useSessionStorage from "@hooks/useSessionStorage";
-import InviteSender from "@invites/InviteSender";
-import NotificationBell from "@shared/NotificationBell";
-import DefaultAvatar from "@images/DefaultAvatar.svg";
-import AddSign from "@svg/AddSign.svg?react";
+import InviteSender from "@notifications/InviteSender";
+import NotificationBell from "@notifications/NotificationBell";
+import { DefaultAvatar, AddSign } from "@utils/svgIcons";
+import DOMPurify from "dompurify";
+import * as Sentry from "@sentry/react";
 
 export default function ConversationInbox({
   openConversation,
@@ -17,7 +17,6 @@ export default function ConversationInbox({
   const { messages, fetchConversation, handleInvite, createMessage } =
     useMessage();
   const [uniqueConversation, setUniqueConversation] = useState([]);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const unreadMessages = useUnreadMessages();
 
@@ -29,22 +28,33 @@ export default function ConversationInbox({
   // render & map unique conversations for user by date (new @ top)
   useEffect(() => {
     if (messages.length > 0) {
+      // collect unique conIds
       const conversationIds = Array.from(
         new Set(messages.map((message) => message.conversationId))
       );
 
-      // collect conversations
+      // collect all conversations by conId
       const fetchAllConversations = async () => {
         const fetchedConversations = await Promise.all(
           conversationIds.map((conversationId) =>
             fetchConversation(conversationId)
           )
         );
-        // filter out any empty conversations
-        const validConversations = fetchedConversations.filter(
+
+        // sanitize output test
+        const sanitizedConversations = fetchedConversations.map(
+          (conversation) =>
+            conversation.map((message) => ({
+              ...message,
+              text: DOMPurify.sanitize(message.text),
+            }))
+        );
+
+        const validConversations = sanitizedConversations.filter(
           (conversation) => conversation && conversation.length > 0
         );
-        // sort conversations after newest
+
+        // sort conversations by date, newest at top
         const sortedConversations = validConversations.sort((a, b) => {
           const lastMessageA = a[a.length - 1];
           const lastMessageB = b[b.length - 1];
@@ -61,7 +71,7 @@ export default function ConversationInbox({
           }
           return 0;
         });
-        // to map unique conversations history
+        // set unique conversations
         setUniqueConversation(sortedConversations);
       };
       fetchAllConversations();
@@ -74,7 +84,7 @@ export default function ConversationInbox({
       const newConversation = await handleInvite(userId);
       return newConversation;
     } catch (error) {
-      console.error("Error inviting user.", error);
+      Sentry.captureException(error);
     }
   };
 
@@ -160,9 +170,15 @@ export default function ConversationInbox({
                   </div>
 
                   <div className="flex flex-col ml-4 w-40 sm:w-52 md:w-64 flex-grow">
-                    <p className="leading-snug text-xs xl:text-sm font-bold pb-1">
-                      {limitedUsernames}
-                    </p>
+                    {limitedUsernames && limitedUsernames.length > 0 ? (
+                      <p className="leading-snug text-xs xl:text-sm font-bold pb-1">
+                        {limitedUsernames}
+                      </p>
+                    ) : (
+                      <p className="leading-snug text-xs xl:text-sm font-bold pb-1">
+                        Inbjudan skickad, inväntar svar...
+                      </p>
+                    )}
                     <p className="leading-snug text-xs">
                       {lastMessage.userId === user.id
                         ? `Du: ${

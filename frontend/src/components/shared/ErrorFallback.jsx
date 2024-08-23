@@ -1,11 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@hooks/useContextHooks";
 import Cookies from "js-cookie";
+import { checkToken } from "@utils/authUtils";
 
 export default function ErrorFallback({ onReset }) {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
+  // change to authUtils - checkToken
   const isTokenValid = () => {
     const token = Cookies.get("token");
     return token !== undefined;

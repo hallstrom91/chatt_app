@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useTheme } from "@hooks/useContextHooks";
 
 export default function Footer() {
-  const { toggleTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <>
@@ -16,7 +16,7 @@ export default function Footer() {
             onClick={toggleTheme}
             className="px-2 py-1 mt-2 text-sm border border-black rounded bg-white text-black"
           >
-            Tema
+            {theme === "light" ? "Mörkt Tema" : "Ljust Tema"}
           </button>
         </div>
       </footer>

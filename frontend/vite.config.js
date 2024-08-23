@@ -30,11 +30,10 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@images": "/src/assets/images",
       "@svg": "/src/assets/svg",
       "@authentication": "/src/components/authentication",
       "@chat": "/src/components/chat",
-      "@invites": "/src/components/invites",
+      "@notifications": "/src/components/notifications",
       "@layout": "/src/components/layout",
       "@navigation": "/src/components/navigation",
       "@profile": "/src/components/profile",

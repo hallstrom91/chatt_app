@@ -22,7 +22,6 @@ const ProtectedRoute = () => {
     // at mount
     if (isAuthenticated) {
       const token = Cookies.get("token");
-      console.log("protectedRoute checkToken @ mount");
       checkToken(user, token, onAuthFail);
     } else {
       // if trying to access /profile or /chat - send back to login/index
@@ -32,11 +31,9 @@ const ProtectedRoute = () => {
     const interval = setInterval(() => {
       if (isAuthenticated) {
         const token = Cookies.get("token");
-        console.log("protectedRoute checkToken @ interval - 15s");
         checkToken(user, token, onAuthFail);
       } else {
         // if user is not authenticated ++ add user to statement?
-        console.log("protectedroute interval - authfail");
         onAuthFail();
       }
     }, 10000); // 10s interval

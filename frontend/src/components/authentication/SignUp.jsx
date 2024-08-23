@@ -6,8 +6,14 @@ import {
   validateEmail,
   validatePassword,
 } from "@utils/authUtils";
-import RegisterClipboard from "@svg/RegisterClipboard.svg?react";
-import ExclamationMark from "@svg/ExclamationMark.svg?react";
+import RandomAvatar from "@shared/RandomAvatar";
+import UploadAvatar from "@shared/UploadAvatar";
+import {
+  DefaultAvatar,
+  RegisterClipboard,
+  ExclamationMark,
+} from "@utils/svgIcons";
+import * as Sentry from "@sentry/react";
 
 export default function SignUp() {
   const { register } = useAuth();
@@ -21,6 +27,28 @@ export default function SignUp() {
     email: "",
     avatar: "",
   });
+
+  // random avatar selection
+  const [selectedAvatar, setSelectedAvatar] = useState(null);
+  const [showRandomAvatars, setShowRandomAvatars] = useState(false);
+  const [showUploadAvatar, setShowUploadAvatar] = useState(false);
+
+  const handleShowRandomAvatars = () => {
+    setShowRandomAvatars(!showRandomAvatars);
+  };
+
+  const handleShowUploadAvatar = () => {
+    setShowUploadAvatar(!showUploadAvatar);
+  };
+
+  const handleAvatarSelect = (avatar) => {
+    if (!avatar) return;
+    setSelectedAvatar(avatar);
+    setUserData((prevData) => ({
+      ...prevData,
+      avatar: avatar,
+    }));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,7 +73,7 @@ export default function SignUp() {
 
     if (!validatePassword(userData.password)) {
       setError(
-        "Lösenordet måste vara sex tecken långt, innehålla en siffra och ett specialtecken."
+        "Lösenordet måste vara sex tecken långt, innehålla en siffra och ett specialtecken !&#$%^&*"
       );
       return;
     }
@@ -58,7 +86,6 @@ export default function SignUp() {
         userData.avatar
       );
       setSuccess("Registrering lyckad.");
-      console.info("API Response - Register:", data);
       setUserData({
         username: "",
         password: "",
@@ -66,14 +93,15 @@ export default function SignUp() {
         email: "",
         avatar: "",
       });
+      setSelectedAvatar(null);
       const successTimer = setTimeout(() => {
         setSuccess("");
         navigate("/");
-      }, 7000); //7s wait and then redirect
+      }, 5000); //7s wait and then redirect
       return () => clearTimeout(successTimer);
     } catch (error) {
       const translatedError = translateError(error.message);
-      console.error("register failed", translatedError);
+      Sentry.captureException(error);
       setError(translatedError);
       const errorTimer = setTimeout(() => {
         setError("");
@@ -92,134 +120,150 @@ export default function SignUp() {
             </h1>
             <RegisterClipboard className="icon ml-2" height={35} />
           </div>
-          <div className="grid justify-items-center px-5">
-            <div className="relative px-4 mb-3 flex items-center">
-              <label
-                htmlFor="register-username"
-                className="tracking-tighter font-semibold hidden"
-              >
-                Användarnamn:
-              </label>
-              <input
-                type="text"
-                name="username"
-                id="register-username"
-                autoComplete="username"
-                placeholder="Användarnamn"
-                value={userData.username}
-                onChange={handleChange}
-                className="rounded block px-2 py-1 tracking-tight text-black placeholder-neutral-500"
-              />
-              <span className="absolute right-0 top-1 transform translate-y-0 translate-x-3 pr-2">
-                {userData.username === "" && error && (
-                  <ExclamationMark
-                    height={20}
-                    className="fill-btnDelete-light"
-                  />
-                )}
-              </span>
+          <form onSubmit={handleSubmit}>
+            <div className="grid justify-items-center px-5">
+              <div className="relative px-4 mb-3 flex items-center">
+                <label
+                  htmlFor="register-username"
+                  className="tracking-tighter font-semibold hidden"
+                >
+                  Användarnamn:
+                </label>
+                <input
+                  type="text"
+                  name="username"
+                  id="register-username"
+                  autoComplete="username"
+                  placeholder="Användarnamn"
+                  value={userData.username}
+                  onChange={handleChange}
+                  className="rounded block px-2 py-1 tracking-tight text-black placeholder-neutral-500"
+                />
+                <span className="absolute right-0 top-1 transform translate-y-0 translate-x-3 pr-2">
+                  {userData.username === "" && error && (
+                    <ExclamationMark
+                      height={20}
+                      className="fill-btnDelete-light"
+                    />
+                  )}
+                </span>
+              </div>
+              <div className="relative px-4 mb-3 flex items-center">
+                <label
+                  htmlFor="register-password"
+                  className="tracking-tighter font-semibold hidden"
+                >
+                  Lösenord:
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  id="register-password"
+                  autoComplete="current-password"
+                  placeholder="Lösenord"
+                  value={userData.password}
+                  onChange={handleChange}
+                  className="rounded block px-2 py-1 tracking-tight text-black placeholder-neutral-500"
+                />
+                <span className="absolute right-0 top-1 transform translate-y-0 translate-x-3 pr-2">
+                  {userData.password === "" && error && (
+                    <ExclamationMark
+                      height={20}
+                      className="fill-btnDelete-light"
+                    />
+                  )}
+                </span>
+              </div>
+              <div className="px-4 mb-3 justify-center">
+                <label
+                  htmlFor="confirm-password"
+                  className="tracking-tighter font-semibold hidden"
+                >
+                  Bekräfta Lösenord:
+                </label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  id="confirm-password"
+                  autoComplete="new-password"
+                  placeholder="Bekräfta Lösenord"
+                  value={userData.confirmPassword}
+                  onChange={handleChange}
+                  className="rounded block px-2 py-1 tracking-tight text-black placeholder-neutral-500"
+                />
+              </div>
+              <div className="relative px-4 mb-3 flex items-center">
+                <label
+                  htmlFor="register-email"
+                  className="tracking-tighter font-semibold hidden"
+                >
+                  Epost:
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  id="register-email"
+                  autoComplete="email"
+                  placeholder="Epost"
+                  value={userData.email}
+                  onChange={handleChange}
+                  className="rounded block px-2 py-1 tracking-tight text-black placeholder-neutral-500"
+                />
+                <span className="absolute right-0 top-1 transform translate-y-0 translate-x-3 pr-2">
+                  {userData.email === "" && error && (
+                    <ExclamationMark
+                      height={20}
+                      className="fill-btnDelete-light"
+                    />
+                  )}
+                </span>
+              </div>
+              <div className="relative px-2 mb-3 flex items-center">
+                <button
+                  type="button"
+                  className="mr-2 px-2 py-1 text-sm rounded bg-btnNeutral-light dark:bg-btnNeutral-dark  dark:text-black  text-white"
+                  onClick={handleShowRandomAvatars}
+                >
+                  Välj Avatar
+                </button>
+                <button
+                  type="button"
+                  className="ml-1 px-2 py-1 text-sm rounded bg-btnNeutral-light dark:bg-btnNeutral-dark  dark:text-black  text-white"
+                  onClick={handleShowUploadAvatar}
+                >
+                  Ladda upp Avatar
+                </button>
+              </div>
             </div>
-            <div className="relative px-4 mb-3 flex items-center">
-              <label
-                htmlFor="register-password"
-                className="tracking-tighter font-semibold hidden"
-              >
-                Lösenord:
-              </label>
-              <input
-                type="password"
-                name="password"
-                id="register-password"
-                autoComplete="new-password"
-                placeholder="Lösenord"
-                value={userData.password}
-                onChange={handleChange}
-                className="rounded block px-2 py-1 tracking-tight text-black placeholder-neutral-500"
-              />
-              <span className="absolute right-0 top-1 transform translate-y-0 translate-x-3 pr-2">
-                {userData.password === "" && error && (
-                  <ExclamationMark
-                    height={20}
-                    className="fill-btnDelete-light"
-                  />
-                )}
-              </span>
+            <div className="grid justify-end mr-10">
+              <Link to={"/"} className="text-xs">
+                Redan medlem?
+              </Link>
             </div>
-            <div className="px-4 mb-3 justify-center">
-              <label
-                htmlFor="confirm-password"
-                className="tracking-tighter font-semibold hidden"
-              >
-                Bekräfta Lösenord:
-              </label>
-              <input
-                type="password"
-                name="confirmPassword"
-                id="confirm-password"
-                autoComplete="new-password"
-                placeholder="Bekräfta Lösenord"
-                value={userData.confirmPassword}
-                onChange={handleChange}
-                className="rounded block px-2 py-1 tracking-tight text-black placeholder-neutral-500"
-              />
+            <div className="flex justify-start pl-8">
+              {selectedAvatar ? (
+                <img
+                  src={selectedAvatar}
+                  alt="user avatar"
+                  className="object-cover w-20 h-20 rounded-full border-4 border-container-dark dark:border-container-light"
+                />
+              ) : (
+                <img
+                  src={DefaultAvatar}
+                  alt="default avatar"
+                  className="object-cover w-20 h-20 rounded-full border-4 border-container-dark dark:border-container-light"
+                />
+              )}
             </div>
-            <div className="relative px-4 mb-3 flex items-center">
-              <label
-                htmlFor="register-email"
-                className="tracking-tighter font-semibold hidden"
+            <div className="flex justify-end mr-10">
+              <button
+                type="submit"
+                className="px-2 py-1 mt-2 text-sm border border-black rounded text-white bg-btnLogin-light dark:bg-btnLogin-dark tracking-tight"
               >
-                Epost:
-              </label>
-              <input
-                type="email"
-                name="email"
-                id="register-email"
-                autoComplete="email"
-                placeholder="Epost"
-                value={userData.email}
-                onChange={handleChange}
-                className="rounded block px-2 py-1 tracking-tight text-black placeholder-neutral-500"
-              />
-              <span className="absolute right-0 top-1 transform translate-y-0 translate-x-3 pr-2">
-                {userData.email === "" && error && (
-                  <ExclamationMark
-                    height={20}
-                    className="fill-btnDelete-light"
-                  />
-                )}
-              </span>
+                Skicka
+              </button>
             </div>
-            <div className="relative px-4 mb-3 flex items-center">
-              <label
-                htmlFor="register-avatar"
-                className="tracking-tighter font-semibold hidden"
-              >
-                Avatar
-              </label>
-              <input
-                type="text"
-                name="avatar"
-                id="register-avatar"
-                placeholder="Avatar"
-                value={userData.avatar}
-                onChange={handleChange}
-                className="rounded block px-2 py-1 tracking-tight text-black placeholder-neutral-500"
-              />
-            </div>
-          </div>
-          <div className="grid justify-end mr-10">
-            <Link to={"/"} className="text-xs">
-              Redan medlem?
-            </Link>
-          </div>
-          <div className="flex justify-end mr-10 mt-4">
-            <button
-              onClick={handleSubmit}
-              className="px-2 py-1 mt-2 text-sm border border-black rounded text-white bg-btnLogin-light dark:bg-btnLogin-dark tracking-tight"
-            >
-              Skicka
-            </button>
-          </div>
+          </form>
         </div>
         {error && (
           <p className="text-sm font-bold text-black dark:text-white flex justify-center items-center break-words">
@@ -238,10 +282,28 @@ export default function SignUp() {
           <p className="text-xs tracking-tighter">Minst sex tecken.</p>
           <p className="text-xs tracking-tighter">Innehålla en siffra.</p>
           <p className="text-xs tracking-tighter">
-            Innehålla ett specialtecken
+            Innehålla ett specialtecken. - !&#$%^&*
           </p>
         </div>
       </section>
+
+      {/* Avatar test-container */}
+      {showRandomAvatars && (
+        <>
+          <RandomAvatar
+            onSelect={handleAvatarSelect}
+            onClose={() => setShowRandomAvatars(false)}
+          />
+        </>
+      )}
+      {showUploadAvatar && (
+        <>
+          <UploadAvatar
+            onSelect={handleAvatarSelect}
+            onClose={() => setShowUploadAvatar(false)}
+          />
+        </>
+      )}
     </>
   );
 }

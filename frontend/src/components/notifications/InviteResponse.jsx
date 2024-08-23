@@ -1,17 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth, useMessage, useUser } from "@hooks/useContextHooks";
-import NotificationBell from "@shared/NotificationBell";
+import NotificationBell from "@notifications/NotificationBell";
 
 export default function InviteResponse({
   invites = [],
   onClose,
   handleInvite,
-  /*   handleIgnoreInvite,
-    handleAcceptInvite, */
 }) {
   const { user } = useAuth();
   const { createMessage } = useMessage();
-
+  const closeRef = useRef(null);
   // handle invite decline
   const handleIgnore = (conversationId) => {
     handleInvite(conversationId);
@@ -27,13 +25,30 @@ export default function InviteResponse({
     handleInvite(conversationId);
   };
 
+  // close when click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (closeRef.current && !closeRef.current.contains(event.target)) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [onClose]);
+
   return (
     <>
       <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
-        <div className="w-80 bg-container-light dark:bg-container-dark p-4 rounded border text-black dark:text-white border-black/20 dark:border-white/20">
-          <h1 className="text-xl font-bold mb-4">Invite Manager</h1>
+        <div
+          ref={closeRef}
+          className="w-80 bg-container-light dark:bg-container-dark p-4 rounded border text-black dark:text-white border-black/20 dark:border-white/20"
+        >
+          <h1 className="text-xl font-bold mb-4">Dina Förfrågningar</h1>
           {invites.length === 0 ? (
-            <p className="text-sm">Inga nya invites.</p>
+            <p className="text-sm">Du har inga nya förfrågningar.</p>
           ) : (
             <ul className="max-h-72 overflow-y-auto">
               {invites.map((invite) => (

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import ErrorFallback from "@shared/ErrorFallback";
+import * as Sentry from "@sentry/react";
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -12,7 +13,7 @@ class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error("ErrorBoundary caught error at:", error, errorInfo);
+    Sentry.captureException(error);
   }
 
   render() {

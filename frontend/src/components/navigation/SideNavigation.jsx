@@ -1,16 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth, useUser } from "@hooks/useContextHooks";
 import { useUnreadMessages } from "@hooks/useUnreadMessages";
+import { NavOpen, NavClose, Bell, InviteBell } from "@utils/svgIcons";
 import ProfileNavDisplay from "@profile/ProfileNavDisplay";
-import InviteResponse from "@invites/InviteResponse";
-import NotificationBell from "@shared/NotificationBell";
-import useSessionStorage from "@hooks/useSessionStorage";
-import UnreadMessagesPopup from "@invites/UnreadMessagesPopup";
-import NavOpen from "@svg/NavOpen.svg?react";
-import NavClose from "@svg/NavClose.svg?react";
-import Bell from "@svg/Bell.svg?react";
-import InviteBell from "@svg/InviteBell.svg?react";
+import InviteResponse from "@notifications/InviteResponse";
+import NotificationBell from "@notifications/NotificationBell";
+import UnreadMessagesPopup from "@notifications/UnreadMessagesPopup";
 
 export default function SideNavigation() {
   const navigate = useNavigate();
@@ -21,7 +17,7 @@ export default function SideNavigation() {
   const [showInviteResponse, setShowInviteResponse] = useState(false);
   //unread msg popup
   const [showUnreadPopup, setShowUnreadPopup] = useState(false);
-
+  const closeRef = useRef(null);
   const handleToggle = () => {
     setIsOpen(!isOpen);
   };
@@ -69,10 +65,22 @@ Invite and Message Display
     setShowUnreadPopup(!showUnreadPopup);
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (closeRef.current && !closeRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [handleToggle]);
+
   if (!user) {
     return null;
   }
-
   return (
     <>
       <div className="bg-container-light dark:bg-container-dark border border-black/20 dark:border-white/20 rounded-lg fixed top-2 right-4 z-50 flex items-center space-x-1">
@@ -102,6 +110,7 @@ Invite and Message Display
       </div>
 
       <div
+        ref={closeRef}
         className={`z-50 fixed top-0 left-0 h-full bg-navbar-light dark:bg-navbar-dark text-black dark:text-white w-64 min-h-screen transform ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-500`}
@@ -132,6 +141,7 @@ Invite and Message Display
           </ul>
         </nav>
       </div>
+
       {/* popup list for unread messages  */}
       {showUnreadPopup && (
         <>

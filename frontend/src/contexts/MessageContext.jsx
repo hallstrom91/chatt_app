@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import { useAuth } from "@hooks/useContextHooks";
 import { v4 as uuidv4 } from "uuid";
+import * as Sentry from "@sentry/react";
 
 const MessageContext = createContext();
 
@@ -26,7 +27,7 @@ export const MessageProvider = ({ children }) => {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error("Failed to fetch messages:", error);
+      Sentry.captureException(error);
       throw error;
     }
   };
@@ -45,7 +46,7 @@ export const MessageProvider = ({ children }) => {
       setMessages(data);
       return data;
     } catch (error) {
-      console.error("Failed to fetch messages", error);
+      Sentry.captureException(error);
       throw error;
     }
   };
@@ -66,7 +67,7 @@ export const MessageProvider = ({ children }) => {
       setMessages((prevMessages) => [...prevMessages, newMessage]);
       return newMessage;
     } catch (error) {
-      console.error("Failed to create and send message:", error);
+      Sentry.captureException(error);
       throw error;
     }
   };
@@ -82,7 +83,7 @@ export const MessageProvider = ({ children }) => {
         },
       });
     } catch (error) {
-      console.error("Failed to delete message:");
+      Sentry.captureException(error);
       throw error;
     }
   };
@@ -93,10 +94,7 @@ export const MessageProvider = ({ children }) => {
       const response = await fetchMessages();
       await Promise.all(response.map((msg) => deleteMessage(msg.id)));
     } catch (error) {
-      console.error(
-        `Failed to delete all messages for userId ${user.id}:`,
-        error
-      );
+      Sentry.captureException(error);
       throw error;
     }
   };
@@ -119,7 +117,7 @@ export const MessageProvider = ({ children }) => {
       }
       throw new Error("Invitation Failed");
     } catch (error) {
-      console.error("Error with invite", error);
+      Sentry.captureException(error);
       throw error;
     }
   };

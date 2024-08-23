@@ -9,7 +9,6 @@ export const useUnreadMessages = () => {
   const { fetchMessages, fetchConversation } = useMessage();
   const { fetchUserById } = useUser();
   const token = Cookies.get("token");
-  // key for unread
   const keyForUnreadMsg = user ? `${user.id}_unread` : "unread";
 
   const [unreadMessages, setUnreadMessages] = useLocalStorage(
@@ -84,25 +83,18 @@ export const useUnreadMessages = () => {
       ...prev,
       ...updateUnreadMessages,
     }));
-  }, [fetchMessages, fetchConversation, user, setUnreadMessages]);
+  }, [user, setUnreadMessages]);
 
   useEffect(() => {
     // if user && jwtToken run at mount
     if (user && token) {
-      fetchMessages();
       fetchUnreadMessages();
-      console.log("fetchUnreadMessages hook @ mount");
     }
-
-    let isFetching = false;
 
     // repeat at interval 60-180s
     const interval = setInterval(() => {
-      if (user && token && !isFetching) {
-        console.log("Interval Unread - 60s");
-        isFetching = true;
-        fetchMessages();
-        fetchUnreadMessages().finally(() => (isFetching = false));
+      if (user && token) {
+        fetchUnreadMessages();
       }
     }, 60000); // now 60s
 

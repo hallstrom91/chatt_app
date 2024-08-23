@@ -1,5 +1,4 @@
-import EditUser from "@svg/EditUser.svg?react";
-import EditUserSecure from "@svg/EditUserSecure.svg?react";
+import { EditUser, EditUserSecure } from "@utils/svgIcons";
 
 export default function UserNavigation({ setActiveTab }) {
   return (

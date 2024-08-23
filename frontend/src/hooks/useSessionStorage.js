@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import * as Sentry from "@sentry/react";
 
 const useSessionStorage = (key, initialValue) => {
   // get init value from sessionStorage
@@ -7,7 +8,7 @@ const useSessionStorage = (key, initialValue) => {
       const item = sessionStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      console.error("Error reading sessionStorage key", key, error);
+      Sentry.captureException(error);
       return initialValue;
     }
   });
@@ -21,7 +22,7 @@ const useSessionStorage = (key, initialValue) => {
         setStoredValue(valueToStore);
         sessionStorage.setItem(key, JSON.stringify(valueToStore));
       } catch (error) {
-        console.error("Error setting sessionStorage key", error);
+        Sentry.captureException(error);
       }
     },
     [key, storedValue] // recreate ONLY if key / value changes

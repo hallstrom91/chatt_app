@@ -5,14 +5,12 @@ export const checkToken = (user, token, onAuthFail) => {
   // if isAuthenticated session value is missing or false - logout
   const sessionAuth = sessionStorage.getItem("isAuthenticated");
   if (sessionAuth === null || sessionAuth === "false") {
-    console.log("IsAuth missing or false");
     onAuthFail();
     return;
   }
 
   // if token is missing, logout and redirect
   if (!token) {
-    console.log("check token - token missing");
     onAuthFail();
     return; // stop function
   }
@@ -23,7 +21,6 @@ export const checkToken = (user, token, onAuthFail) => {
 
   // if token is expired - logout
   if (decodedToken.exp < currentTime) {
-    console.log("check token - expired token");
     onAuthFail();
     return; // stop function
   }
@@ -34,7 +31,6 @@ export const checkToken = (user, token, onAuthFail) => {
     user.id !== decodedToken.id ||
     user.username !== decodedToken.user
   ) {
-    console.log("check token - user does not match jwt-user");
     onAuthFail();
     return; // stop function
   }
@@ -49,6 +45,10 @@ export const translateError = (errorMessage) => {
       return "Användarnamn, lösenord eller e-postadress saknas.";
     case "User registered successfully":
       return "Konto skapat.";
+    case "Invalid credentials":
+      return "Ogiltiga uppgifter.";
+    case "Username or password is missing":
+      return "Användarnamn eller lösenord saknas.";
     default:
       return "Ett oväntat fel har inträffat, var vänlig försök igen.";
   }
@@ -59,7 +59,7 @@ export const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
-// validate password for register
+// validate password for register - allowed !&#$%^&*
 export const validatePassword = (password) => {
   // minimum 6 characters, contain min one number and one special character.
   const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/;

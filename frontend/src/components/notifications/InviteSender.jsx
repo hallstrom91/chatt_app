@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useAuth } from "@hooks/useContextHooks";
+import DOMPurify from "dompurify";
+import * as Sentry from "@sentry/react";
+
 export default function InviteSender({
   userList,
   onClose,
@@ -33,22 +36,25 @@ export default function InviteSender({
           throw new Error("No conversation ID returned...");
         }
       } catch (error) {
-        console.error("Failed to invite user.", error);
+        Sentry.captureException(error);
       }
     }
   };
+
   // create first message after invite
   const createFirstMessage = async () => {
     if (firstMessage.trim() && newConversationId) {
       try {
+        // sanitize input
+        const sanitizedMessage = DOMPurify.sanitize(firstMessage);
         const message = {
-          text: firstMessage.trim(),
+          text: sanitizedMessage,
           conversationId: newConversationId,
         };
         await createMessage(message);
         onClose();
       } catch (error) {
-        console.error("Failed to send first message:", error);
+        Sentry.captureException(error);
       }
     }
   };

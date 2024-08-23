@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@hooks/useContextHooks";
-import DefaultAvatar from "@images/DefaultAvatar.svg";
+import { DefaultAvatar } from "@utils/svgIcons";
 
 export default function ProfileNavDisplay() {
   const { user } = useAuth();
