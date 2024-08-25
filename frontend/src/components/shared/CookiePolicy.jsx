@@ -45,13 +45,13 @@ export default function CookiePolicy({ children }) {
         <div className="p-2">
           <button
             onClick={declineCookies}
-            className="mr-2 px-4 py-2 bg-btnDelete-light dark:bg-btnDelete-dark text-white rounded text-sm"
+            className="mr-2 px-2 py-2 bg-btnDelete-light dark:bg-btnDelete-dark text-white rounded text-base"
           >
             Avböj
           </button>
           <button
             onClick={acceptCookies}
-            className="mr-2 px-4 py-2 bg-btnPrimary-light dark:bg-btnPrimary-dark text-white rounded text-sm"
+            className="mr-2 px-2 py-2 bg-btnPrimary-light dark:bg-btnPrimary-dark text-white rounded text-base"
           >
             Acceptera
           </button>

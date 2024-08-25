@@ -100,7 +100,7 @@ export default function ConversationInbox({
           <div className="py-2 pr-4">
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex justify-around rounded-2xl font-semibold text-sm items-center py-2 pl-1 pr-3 bg-btnUpdate-light dark:bg-btnUpdate-dark"
+              className="flex justify-around rounded-2xl font-semibold text-base items-center py-2 pl-1 pr-3 bg-btnUpdate-light dark:bg-btnUpdate-dark"
             >
               <AddSign className="icon pr-1 mb" height={15} />
               Ny Chatt
@@ -210,7 +210,7 @@ export default function ConversationInbox({
                         messages: conversation,
                       })
                     }
-                    className="h-6 px-3 text-sm font-bold rounded-full border border-black dark:border-white text-black dark:text-white"
+                    className="py-1 px-3 text-base font-bold rounded-full border border-black dark:border-white text-black dark:text-white"
                   >
                     Öppna
                   </button>

@@ -42,12 +42,14 @@ export default function App() {
 
   return (
     <>
-      <ErrorBoundary>
-        <CookiePolicyHOC>
-          <AllRoutes />
-          <Footer />
-        </CookiePolicyHOC>
-      </ErrorBoundary>
+      <div className="flex flex-col min-h-screen">
+        <ErrorBoundary>
+          <CookiePolicyHOC>
+            <AllRoutes />
+            <Footer />
+          </CookiePolicyHOC>
+        </ErrorBoundary>
+      </div>
     </>
   );
 }

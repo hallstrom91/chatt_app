@@ -52,14 +52,14 @@ export default function RandomAvatar({ onSelect, onClose }) {
           <div className="flex justify-end pt-5">
             <button
               onClick={onClose}
-              className="mr-1 px-2 py-1 rounded bg-btnNeutral-light dark:bg-btnNeutral-dark  dark:text-black  text-white"
+              className="mr-1 px-2 py-2 rounded bg-btnNeutral-light dark:bg-btnNeutral-dark  dark:text-black  text-white"
             >
               Avbryt
             </button>
             <button
               onClick={handleConfirmSelection}
               disabled={!selectedAvatar}
-              className="px-2 py-1 bg-btnPrimary-light dark:bg-btnPrimary-dark text-white rounded"
+              className="px-2 py-2 bg-btnPrimary-light dark:bg-btnPrimary-dark text-white rounded"
             >
               Bekräfta
             </button>

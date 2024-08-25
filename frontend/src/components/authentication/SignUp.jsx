@@ -218,21 +218,28 @@ export default function SignUp() {
                   )}
                 </span>
               </div>
-              <div className="relative px-2 mb-3 flex items-center">
+              <div className="grid grid-rows-1 relative px-4 mb-3 items-center w-full">
+                <p className="text-xs tracking-tight pb-1">
+                  Välj en anonym avatar från galleriet.
+                </p>
                 <button
                   type="button"
-                  className="mr-2 px-2 py-1 text-sm rounded bg-btnNeutral-light dark:bg-btnNeutral-dark  dark:text-black  text-white"
+                  className="mb-1 px-2 py-1 text-sm rounded bg-btnNeutral-light dark:bg-btnNeutral-dark  dark:text-black  text-white"
                   onClick={handleShowRandomAvatars}
                 >
-                  Välj Avatar
+                  Anonym Avatar
                 </button>
+                <p className="text-center text-sm mx-1 font-semibold">eller</p>
                 <button
                   type="button"
-                  className="ml-1 px-2 py-1 text-sm rounded bg-btnNeutral-light dark:bg-btnNeutral-dark  dark:text-black  text-white"
+                  className="mt-1 px-2 py-1 text-sm rounded bg-btnNeutral-light dark:bg-btnNeutral-dark  dark:text-black  text-white"
                   onClick={handleShowUploadAvatar}
                 >
-                  Ladda upp Avatar
+                  Personlig Avatar
                 </button>
+                <p className="text-xs tracking-tight pt-1">
+                  Ladda upp en personlig avatar.
+                </p>
               </div>
             </div>
             <div className="grid justify-end mr-10">
@@ -240,6 +247,7 @@ export default function SignUp() {
                 Redan medlem?
               </Link>
             </div>
+
             <div className="flex justify-start pl-8">
               {selectedAvatar ? (
                 <img
@@ -248,19 +256,21 @@ export default function SignUp() {
                   className="object-cover w-20 h-20 rounded-full border-4 border-container-dark dark:border-container-light"
                 />
               ) : (
-                <img
-                  src={DefaultAvatar}
-                  alt="default avatar"
-                  className="object-cover w-20 h-20 rounded-full border-4 border-container-dark dark:border-container-light"
-                />
+                <>
+                  <img
+                    src={DefaultAvatar}
+                    alt="default avatar"
+                    className="object-cover w-20 h-20 rounded-full border-4 border-container-dark dark:border-container-light"
+                  />
+                </>
               )}
             </div>
             <div className="flex justify-end mr-10">
               <button
                 type="submit"
-                className="px-2 py-1 mt-2 text-sm border border-black rounded text-white bg-btnLogin-light dark:bg-btnLogin-dark tracking-tight"
+                className="px-2 py-2 mt-2 text-base rounded text-white bg-btnLogin-light dark:bg-btnLogin-dark"
               >
-                Skicka
+                Registrera
               </button>
             </div>
           </form>

@@ -36,7 +36,7 @@ export default function ErrorFallback({ onReset }) {
           </p>
           <button
             onClick={handleClick}
-            className="px-2 py-1 border text-black border-black rounded bg-btnNeutral-light dark:bg-btnNeutral-dark"
+            className="px-2 py-2 border text-black border-black rounded bg-btnNeutral-light dark:bg-btnNeutral-dark"
           >
             Tillbaka Hem
           </button>

@@ -34,7 +34,7 @@ export default function NotFound() {
           <p className="text-xs pb-2">Sidan kan vara under konstruktion.</p>
           <button
             onClick={handleClick}
-            className="px-2 py-1 border text-black border-black rounded bg-btnNeutral-light dark:bg-btnNeutral-dark"
+            className="px-2 py-2 border text-black border-black rounded bg-btnNeutral-light dark:bg-btnNeutral-dark"
           >
             Tillbaka Hem
           </button>

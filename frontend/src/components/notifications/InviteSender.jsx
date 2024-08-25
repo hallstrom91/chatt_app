@@ -68,6 +68,7 @@ export default function InviteSender({
               <h1 className="text-xl font-bold mb-4">Skapa en ny chatt</h1>
               <input
                 type="text"
+                id="findFriend"
                 placeholder="Hitta Användare"
                 value={userSearch}
                 onChange={(e) => setUserSearch(e.target.value)}
@@ -95,13 +96,13 @@ export default function InviteSender({
               <div className="flex justify-end mt-4">
                 <button
                   onClick={onClose}
-                  className="mr-2 px-2 py-1 bg-btnNeutral-light dark:bg-btnNeutral-dark text-white dark:text-black rounded"
+                  className="mr-2 px-2 py-2 text-base bg-btnNeutral-light dark:bg-btnNeutral-dark text-white dark:text-black rounded"
                 >
                   Avbryt
                 </button>
                 <button
                   onClick={handleInviteSubmit}
-                  className="px-2 py-1 bg-btnPrimary-light dark:bg-btnPrimary-dark text-white rounded"
+                  className="px-2 py-2 bg-btnPrimary-light dark:bg-btnPrimary-dark text-white rounded"
                 >
                   Skicka
                 </button>
@@ -118,13 +119,13 @@ export default function InviteSender({
               />
               <button
                 onClick={onClose}
-                className="mr-2 px-2 py-1 bg-btnNeutral-light dark:bg-btnNeutral-dark text-white dark:text-black rounded"
+                className="mr-2 px-2 py-2 bg-btnNeutral-light dark:bg-btnNeutral-dark text-white dark:text-black rounded"
               >
                 Avbryt
               </button>
               <button
                 onClick={createFirstMessage}
-                className="px-2 py-1 bg-btnPrimary-light dark:bg-btnPrimary-dark text-white rounded"
+                className="px-2 py-2 bg-btnPrimary-light dark:bg-btnPrimary-dark text-white rounded"
               >
                 Skicka
               </button>

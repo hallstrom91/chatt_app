@@ -151,7 +151,7 @@ export default function ConversationDisplay({
               </div>
             </div>
             {/* current chat - render */}
-            <div className="flex flex-col mb-4 gap-4 py-3 overflow-x-hidden max-h-[60vh]">
+            <div className="flex flex-col mb-4 gap-4 py-3 overflow-x-hidden max-h-[50vh]">
               {conversation.messages &&
                 conversation.messages.map((msg) => (
                   <div
@@ -203,6 +203,7 @@ export default function ConversationDisplay({
           </div>
           <div className="flex justify-start items-center py-2 px-4">
             <textarea
+              id="newMessage"
               className="border-black dark:border-white text-black border rounded-lg py-2 px-4 w-full mr-4 resize-none"
               placeholder="Skriv Något?"
               value={newMessage}
@@ -210,9 +211,9 @@ export default function ConversationDisplay({
             />
             <button
               onClick={handleSubmitMessage}
-              className="px-4 py-2 bg-btnPrimary-light dark:bg-btnPrimary-dark text-white rounded"
+              className="px-2 py-2 bg-btnPrimary-light dark:bg-btnPrimary-dark text-white rounded"
             >
-              Sänd
+              Skicka
             </button>
           </div>
         </div>

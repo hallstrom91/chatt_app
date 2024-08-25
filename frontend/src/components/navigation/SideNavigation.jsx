@@ -99,7 +99,7 @@ Invite and Message Display
           />
         </span>
         <span className="z-50">
-          <button onClick={handleToggle} className="p-1 rounded">
+          <button onClick={handleToggle} className="flex items-center pr-1">
             {isOpen ? (
               <NavClose className="icon" height={35} />
             ) : (
@@ -115,7 +115,7 @@ Invite and Message Display
           isOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-500`}
       >
-        <div className="p-4 border-b-2 border-black dark:border-white">
+        <div className="p-4 border-b-2 border-black/50 dark:border-white/50">
           <ProfileNavDisplay />
         </div>
         <nav className="p-4 h-full">
@@ -133,7 +133,7 @@ Invite and Message Display
             <li className="my-2 pt-10 flex justify-end">
               <button
                 onClick={handleLogout}
-                className="px-2 py-1 mt-2 text-sm border border-black rounded bg-white text-black"
+                className="px-2 py-2 mt-2 text-base rounded bg-btnDelete-light dark:bg-btnDelete-dark text-white"
               >
                 Logga ut
               </button>

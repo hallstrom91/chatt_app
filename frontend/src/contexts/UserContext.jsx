@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import { useAuth } from "@hooks/useContextHooks";
-import useLocalStorage from "@hooks/useLocalStorage";
+import * as Sentry from "@sentry/react";
 
 const UserContext = createContext();
 

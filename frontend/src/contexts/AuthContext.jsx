@@ -111,6 +111,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUserInStorage = (newUserData) => {
+    setUser(newUserData);
+  };
+
   // logout and clear values function
   const logout = async () => {
     if (user && user.id) {
@@ -125,6 +129,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    updateUserInStorage,
     jwtToken,
     isAuthenticated,
     setIsAuthenticated,

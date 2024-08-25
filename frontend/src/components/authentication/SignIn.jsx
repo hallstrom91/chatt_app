@@ -103,9 +103,9 @@ export default function SignIn() {
             <div className="grid justify-end mr-10 mt-4">
               <button
                 type="submit"
-                className="px-2 py-1 mt-2 text-sm border border-black rounded text-white bg-btnLogin-light dark:bg-btnLogin-dark tracking-tight"
+                className="px-2 py-2 mt-2 text-base rounded text-white bg-btnLogin-light dark:bg-btnLogin-dark"
               >
-                Skicka
+                Logga In
               </button>
             </div>
           </form>

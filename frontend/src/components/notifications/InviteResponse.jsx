@@ -62,13 +62,13 @@ export default function InviteResponse({
                   <div className="flex justify-end pt-2">
                     <button
                       onClick={() => handleIgnore(invite.conversationId)}
-                      className="mr-1 px-2 py-1 rounded tracking-tight text-sm font-semibold bg-btnDelete-light dark:bg-btnDelete-dark text-white"
+                      className="mr-1 px-2 py-2 rounded text-sm font-semibold bg-btnDelete-light dark:bg-btnDelete-dark text-white"
                     >
                       Avböj
                     </button>
                     <button
                       onClick={() => handleAccept(invite.conversationId)}
-                      className="ml-1 px-2 py-1 rounded tracking-tight text-sm font-semibold bg-btnPrimary-light dark:bg-btnPrimary-dark text-white"
+                      className="ml-1 px-2 py-2 rounded text-sm font-semibold bg-btnPrimary-light dark:bg-btnPrimary-dark text-white"
                     >
                       Acceptera
                     </button>
@@ -80,7 +80,7 @@ export default function InviteResponse({
           <div className="flex justify-end pt-5">
             <button
               onClick={onClose}
-              className="mr-1 px-2 py-1 rounded text-sm font-semibold bg-btnNeutral-light dark:bg-btnNeutral-dark  dark:text-black  text-white"
+              className="mr-1 px-2 py-2 rounded text-base font-semibold bg-btnNeutral-light dark:bg-btnNeutral-dark  dark:text-black  text-white"
             >
               Stäng
             </button>
